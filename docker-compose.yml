@@ -1,0 +1,97 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres17
+    environment:
+      POSTGRES_DB: suggestionsdb
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-postgres} -d suggestionsdb",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis7
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  dotnet-web-api:
+    build:
+      context: .
+    container_name: minimalapiapp
+    image: creativefree/dopamine-kick-api:latest
+    ports:
+      - 5009:5009
+    environment:
+      ASPNETCORE_HTTP_PORTS: 5009
+      ConnectionStrings__UsersDBConnectionString: "Host=postgres;Port=5432;Database=usersdb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}"
+      ConnectionStrings__RedisConnection: "redis:6379"
+      ConnectionStrings__OTLP_Endpoint: "http://otel-collector:4317"
+      Keycloak__ClientSecret: ${ADMIN_CLIENT_SECRET}
+      BlobStorage__ServiceUrl: "http://seaweedfs:8333"
+      BlobStorage__PublicUrl: "http://localhost:8333"
+      BlobStorage__BucketName: "user-profile-images"
+    depends_on:
+      postgres:
+        condition: service_healthy
+        restart: true
+      redis:
+        condition: service_healthy
+        restart: true
+      # seaweedfs:
+      #   condition: service_healthy
+      #   restart: true
+    develop:
+      watch:
+        - action: rebuild
+          path: ./
+          target: /usr/app/
+
+  product-feedback-bff:
+    container_name: product-feedback-bff
+    image: creativefree/product-feedback-bff:latest
+    ports:
+      - "5224:5224"
+    environment:
+      ASPNETCORE_URLS: "http://+:5224"
+      ASPNETCORE_ENVIRONMENT: "Development"
+      DOTNET_RUNNING_IN_CONTAINER: "true"
+      DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: "true"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      ForwardedHeaders__KnownNetworks__0: "0.0.0.0/0"
+      Redis__Host: "redis:6379"
+      ReverseProxy__Clusters__product-feedback-api__Destinations__destination1__Address: "http://minimalapiapp:5009/"
+      KEYCLOAK_SERVER_URL: "https://identity.alexbartleynees.com"
+      OpenIdConnectOptions__ClientSecret: ${CLIENT_SECRET}
+      OpenIdConnectOptions__ClientId: dopamine-kick
+      OpenIdConnectOptions__RedirectUri: http://localhost:3000/signin-oidc
+      OpenIdConnectOptions__RequireHttpsMetadata: false
+      OpenIdConnectOptions__RequireSecureCookies: false
+    depends_on:
+      redis:
+        condition: service_healthy
+        restart: true
+      dotnet-web-api:
+        condition: service_started
+
+volumes:
+  postgres-data:
+  redis-data:
