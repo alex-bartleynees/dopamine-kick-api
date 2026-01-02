@@ -82,7 +82,7 @@ services:
       KEYCLOAK_SERVER_URL: "https://identity.alexbartleynees.com"
       OpenIdConnectOptions__ClientSecret: ${CLIENT_SECRET}
       OpenIdConnectOptions__ClientId: dopamine-kick
-      OpenIdConnectOptions__RedirectUri: http://localhost:3000/signin-oidc
+      OpenIdConnectOptions__RedirectUri: "/dashboard"
       OpenIdConnectOptions__RequireHttpsMetadata: false
       OpenIdConnectOptions__RequireSecureCookies: false
     depends_on:

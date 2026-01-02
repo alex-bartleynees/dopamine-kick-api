@@ -1,8 +1,11 @@
+using FluentValidation;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Users.Application.Abstractions;
+using Users.Application.Common.Models;
+using Users.Application.Common.Validators;
 using Users.Infrastructure.Configuration;
 using Users.Infrastructure.DbContexts;
 using Users.Infrastructure.Repositories;
@@ -41,6 +44,8 @@ public static class UsersModule
         });
 
         services.AddScoped<IUsersRepository, UsersRepository>();
+
+        services.AddScoped<IValidator<UserForCreationDto>, UserForCreationDtoValidator>();
 
         services.AddMediator(options =>
         {

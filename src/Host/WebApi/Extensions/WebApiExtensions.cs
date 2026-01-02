@@ -1,8 +1,10 @@
 using Common.Abstractions;
 using Microsoft.OpenApi;
+using SharpGrip.FluentValidation.AutoValidation.Endpoints.Extensions;
 using StackExchange.Redis;
 using Users.Api;
 using WebApi.Middleware;
+using WebApi.ValidationErrors;
 
 namespace WebApi.Extensions;
 
@@ -11,7 +13,7 @@ public static class WebApiExtensions
     public static void RegisterServices(this WebApplicationBuilder builder)
     {
         var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-        
+
         // Add StackExchangeRedisCache service for Redis
         builder.Services.AddStackExchangeRedisCache(options =>
         {
@@ -41,48 +43,54 @@ public static class WebApiExtensions
         });
 
         builder.Services.AddUsersModule(builder.Configuration);
-        
+
         // Add HybridCache service
         builder.Services.AddHybridCache();
-        
+
         builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-        
-               builder.Services.AddCors(options =>
-            {
-                options.AddPolicy(name: MyAllowSpecificOrigins,
-                                  policy =>
-                                  {
-                                      policy.WithOrigins("http://localhost:3000")
-                                          .AllowAnyHeader()
-                                          .AllowAnyMethod();
-                                  });
-            });
-            builder.Services.AddProblemDetails();
 
-            builder.Services.AddAuthentication()
-                .AddJwtBearer(options =>
-                    {
-                        options.Authority = builder.Configuration["Jwt:Authority"]
-                            ?? throw new ArgumentNullException("Jwt:Authority", "JWT Authority must be configured");
-                        options.Audience = builder.Configuration["Jwt:Audience"]
-                            ?? throw new ArgumentNullException("Jwt:Audience", "JWT Audience must be configured");
-                    }
-                );
-
-            builder.Services.AddAuthorizationBuilder();
-
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy(name: MyAllowSpecificOrigins,
+                policy =>
                 {
-                    Version = "v1",
-                    Title = "DopamineKick API",
-                    Description = "DopamineKick API documentation",
+                    policy.WithOrigins("http://localhost:3000")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
                 });
+        });
+        builder.Services.AddProblemDetails();
+        builder.Services.AddFluentValidationAutoValidation(configuration =>
+        {
+            configuration.OverrideDefaultResultFactoryWith<ValidationErrorFactory>();
+        });
+
+        builder.Services.AddAuthentication()
+            .AddJwtBearer(options =>
+                {
+                    options.Authority = builder.Configuration["Jwt:Authority"]
+                                        ?? throw new ArgumentNullException("Jwt:Authority",
+                                            "JWT Authority must be configured");
+                    options.Audience = builder.Configuration["Jwt:Audience"]
+                                       ?? throw new ArgumentNullException("Jwt:Audience",
+                                           "JWT Audience must be configured");
+                }
+            );
+
+        builder.Services.AddAuthorizationBuilder();
+
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Version = "v1",
+                Title = "DopamineKick API",
+                Description = "DopamineKick API documentation",
             });
+        });
     }
-    
+
     public static void RegisterAppConfig(this WebApplication app)
     {
         app.Services.MigrateUsersDatabase();
@@ -97,7 +105,7 @@ public static class WebApiExtensions
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-        
+
         app.UseHttpsRedirection();
 
         var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -111,7 +119,7 @@ public static class WebApiExtensions
     {
         var assemblies = AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => a.GetName().Name?.EndsWith(".Api") == true
-                     || a.GetName().Name == "WebApi");
+                        || a.GetName().Name == "WebApi");
 
         var endpointDefinitions = assemblies
             .SelectMany(a => a.GetTypes())
@@ -123,5 +131,5 @@ public static class WebApiExtensions
         {
             endpointDefinition.RegisterEndpoints(app);
         }
-    } 
+    }
 }

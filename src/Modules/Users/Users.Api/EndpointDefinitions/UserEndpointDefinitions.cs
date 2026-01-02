@@ -4,6 +4,7 @@ using Mediator;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using SharpGrip.FluentValidation.AutoValidation.Endpoints.Extensions;
 using Users.Application.Common.Models;
 using Users.Application.Users.Commands;
 using Users.Application.Users.Queries;
@@ -15,7 +16,7 @@ public class UserEndpointDefinitions : IEndpointDefinition
 {
    public void RegisterEndpoints(WebApplication app)
    {
-      var users = app.MapGroup("api/users");
+      var users = app.MapGroup("api/users").AddFluentValidationAutoValidation();
       
       users.MapGet("{userId}", GetUserById).RequireAuthorization();
       users.MapPost("", CreateUser); 
