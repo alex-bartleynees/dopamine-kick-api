@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Users.Domain.Entities;
-using Users.Infrastructure.Configurations;
+using Users.Infrastructure.Configuration;
 
 namespace Users.Infrastructure.DbContexts;
 
