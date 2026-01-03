@@ -1,3 +1,4 @@
+using Common.Infrastructure.Interceptors;
 using FluentValidation;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
@@ -30,8 +31,11 @@ public static class UsersModule
     {
         var cs = configuration.GetConnectionString("UsersDBConnectionString") ??
                  throw new ArgumentNullException(nameof(configuration), "No connection string provided");
-        services.AddDbContext<UsersContext>(options =>
-            options.UseNpgsql(cs, options => options.EnableRetryOnFailure()));
+        services.AddSingleton<AuditableEntityInterceptor>();
+        services.AddDbContext<UsersContext>((sp, options) =>
+            options
+                .UseNpgsql(cs, npgsqlOptions => npgsqlOptions.EnableRetryOnFailure())
+                .AddInterceptors(sp.GetRequiredService<AuditableEntityInterceptor>()));
 
         // Keycloak HTTP Client
         services.Configure<KeycloakSettings>(configuration.GetSection("Keycloak"));

@@ -18,5 +18,6 @@
   </Folder>
   <Folder Name="/src/Shared/">
     <Project Path="src/Shared/Common.Abstractions/Common.Abstractions.csproj" />
+    <Project Path="src/Shared/Common.Infrastructure/Common.Infrastructure.csproj" />
   </Folder>
 </Solution>
