@@ -12,6 +12,8 @@ public class UsersContextFactory : IDesignTimeDbContextFactory<UsersContext>
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: false)
             .AddJsonFile("appsettings.Development.json", optional: true)
+            .AddUserSecrets<UsersContextFactory>(optional: true)
+            .AddEnvironmentVariables()
             .Build();
 
         return new UsersContext(configuration);

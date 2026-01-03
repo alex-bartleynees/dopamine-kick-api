@@ -95,11 +95,6 @@ public static class WebApiExtensions
     {
         app.Services.MigrateUsersDatabase();
 
-        var config = $"appsettings.{app.Environment}.json";
-        IConfigurationBuilder configBuilder = new ConfigurationBuilder().AddJsonFile("appsettings.json", true)
-            .AddJsonFile(config, true)
-            .AddEnvironmentVariables();
-
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();

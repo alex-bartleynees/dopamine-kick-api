@@ -1,11 +1,9 @@
-using System.ComponentModel.DataAnnotations;
 using Common.Abstractions;
 
 namespace Users.Domain.Entities;
 
 public class User : IAuditable
 {
-    [Key]
     public Guid Id { get; set; }
 
     public string Email { get; set; } = string.Empty;
