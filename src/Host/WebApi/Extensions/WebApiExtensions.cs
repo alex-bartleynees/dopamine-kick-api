@@ -1,4 +1,5 @@
 using Common.Abstractions;
+using Habits.Api;
 using Microsoft.OpenApi;
 using SharpGrip.FluentValidation.AutoValidation.Endpoints.Extensions;
 using StackExchange.Redis;
@@ -43,6 +44,7 @@ public static class WebApiExtensions
         });
 
         builder.Services.AddUsersModule(builder.Configuration);
+        builder.Services.AddHabitsModule(builder.Configuration);
 
         // Add HybridCache service
         builder.Services.AddHybridCache();
@@ -94,6 +96,7 @@ public static class WebApiExtensions
     public static void RegisterAppConfig(this WebApplication app)
     {
         app.Services.MigrateUsersDatabase();
+        app.Services.MigrateHabitsDatabase();
 
         if (app.Environment.IsDevelopment())
         {
