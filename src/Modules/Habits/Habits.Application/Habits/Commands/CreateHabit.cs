@@ -1,0 +1,39 @@
+using Common.Abstractions;
+using Common.Abstractions.Results;
+using Habits.Application.Abstractions;
+using Habits.Application.Common.Models;
+using Habits.Domain.Entities;
+using Mediator;
+
+namespace Habits.Application.Habits.Commands;
+
+public record CreateHabit(Guid UserId, HabitForCreationDto Habit) : IRequest<Result<Habit>>;
+
+public class CreateHabitHandler : IRequestHandler<CreateHabit, Result<Habit>>
+{
+    private readonly IHabitsRepository _habitsRepository;
+    private readonly IUnitOfWork _unitOfWork;
+
+    public CreateHabitHandler(IHabitsRepository habitsRepository, IUnitOfWork unitOfWork)
+    {
+        _habitsRepository = habitsRepository;
+        _unitOfWork = unitOfWork;
+    }
+
+    public async ValueTask<Result<Habit>> Handle(CreateHabit request, CancellationToken cancellationToken)
+    {
+        var habit = new Habit
+        {
+            Id = Guid.NewGuid(),
+            UserId = request.UserId,
+            Name = request.Habit.Name,
+            Emoji = request.Habit.Emoji,
+            Target = request.Habit.Target
+        };
+
+        await _habitsRepository.CreateAsync(habit, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Result<Habit>.Success(habit);
+    }
+}

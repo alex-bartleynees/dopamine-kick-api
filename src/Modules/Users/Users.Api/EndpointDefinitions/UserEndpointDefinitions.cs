@@ -1,6 +1,5 @@
 using Common.Abstractions;
 using Common.Abstractions.Results;
-using Mediator;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -17,20 +16,22 @@ public class UserEndpointDefinitions : IEndpointDefinition
    public void RegisterEndpoints(WebApplication app)
    {
       var users = app.MapGroup("api/users").AddFluentValidationAutoValidation();
-      
+
       users.MapGet("{userId}", GetUserById).RequireAuthorization();
-      users.MapPost("", CreateUser); 
+      users.MapPost("", CreateUser);
    }
 
-   private async Task<Results<Ok<User>, NotFound<Error>>> GetUserById(IMediator mediator, Guid userId)
+   private async Task<Results<Ok<User>, NotFound<Error>>> GetUserById(
+      Users.Api.Mediator.Mediator mediator,
+      Guid userId)
    {
       var query = new GetUserById(userId);
       var result = await mediator.Send(query);
-      return result.IsSuccess? TypedResults.Ok(result.ValueOrThrow) : TypedResults.NotFound(result.Error);
+      return result.IsSuccess ? TypedResults.Ok(result.ValueOrThrow) : TypedResults.NotFound(result.Error);
    }
-   
+
    private async Task<Results<Created<User>, Conflict<Error>, BadRequest<Error>>> CreateUser(
-      IMediator mediator,
+      Users.Api.Mediator.Mediator mediator,
       UserForCreationDto user)
    {
       var command = new CreateUser(user);

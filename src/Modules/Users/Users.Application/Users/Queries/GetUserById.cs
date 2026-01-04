@@ -8,6 +8,7 @@ using Users.Domain.Entities;
 namespace Users.Application.Users.Queries;
 
 public record GetUserById(Guid userId) : IRequest<Result<User>>;
+
 public class GetUserByIdHandler : IRequestHandler<GetUserById, Result<User>>
 {
     private readonly IUsersRepository _usersRepository;
@@ -16,7 +17,7 @@ public class GetUserByIdHandler : IRequestHandler<GetUserById, Result<User>>
     public GetUserByIdHandler(IUsersRepository usersRepository, HybridCache cache)
     {
         _usersRepository = usersRepository ??
-                                 throw new ArgumentNullException(nameof(usersRepository));
+                           throw new ArgumentNullException(nameof(usersRepository));
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
     }
 
@@ -30,8 +31,8 @@ public class GetUserByIdHandler : IRequestHandler<GetUserById, Result<User>>
             cacheKey,
             async ct =>
             {
-                var result = await _usersRepository.GetUser(request.userId);
-                return result.IsSuccess ? result.ValueOrThrow : null;
+                var user = await _usersRepository.GetUser(request.userId, ct);
+                return user;
             },
             new HybridCacheEntryOptions
             {

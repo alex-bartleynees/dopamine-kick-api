@@ -1,5 +1,11 @@
-﻿using Common.Infrastructure.Interceptors;
+﻿using Common.Abstractions;
+using Common.Infrastructure.Interceptors;
+using FluentValidation;
+using Habits.Application.Abstractions;
+using Habits.Application.Common.Models;
+using Habits.Application.Common.Validators;
 using Habits.Infrastructure.DbContexts;
+using Habits.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,13 +33,20 @@ public static class HabitsModule
             options
                 .UseNpgsql(cs, npgsqlOptions => npgsqlOptions.EnableRetryOnFailure())
                 .AddInterceptors(sp.GetRequiredService<AuditableEntityInterceptor>()));
-        
+
+        services.AddScoped<IHabitsRepository, HabitsRepository>();
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<HabitsContext>());
+
+        services.AddScoped<IValidator<HabitForCreationDto>, HabitForCreationDtoValidator>();
+        services.AddScoped<IValidator<BulkHabitsForCreationDto>, BulkHabitsForCreationDtoValidator>();
+        services.AddScoped<HabitForCreationDtoValidator>();
+
         services.AddMediator(options =>
         {
             options.Namespace = "Habits.Api.Mediator";
             options.ServiceLifetime = ServiceLifetime.Scoped;
         });
-        
+
         return services;
     }
 }

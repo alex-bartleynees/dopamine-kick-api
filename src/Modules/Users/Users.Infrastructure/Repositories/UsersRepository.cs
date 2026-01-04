@@ -1,4 +1,3 @@
-using Common.Abstractions.Results;
 using Microsoft.EntityFrameworkCore;
 using Users.Application.Abstractions;
 using Users.Domain.Entities;
@@ -8,39 +7,26 @@ namespace Users.Infrastructure.Repositories;
 
 public class UsersRepository(UsersContext context) : IUsersRepository
 {
-    public async Task<Result<User>> GetUser(Guid userId)
+    public async Task<User?> GetUser(Guid userId, CancellationToken ct = default)
     {
         var user = await context.Users
             .AsNoTracking()
-            .Where(u => u.Id == userId).FirstOrDefaultAsync();
+            .Where(u => u.Id == userId).FirstOrDefaultAsync(ct);
 
-        if (user == null)
-        {
-            return Result<User>.Failure(new Error(404, "Not Found", $"User with id: {userId} was not found"));
-        }
-
-        return Result<User>.Success(user);
+        return user;
     }
 
-    public async Task<Result<User>> GetUserByEmailAsync(string email)
+    public async Task<User?> GetUserByEmailAsync(string email, CancellationToken ct = default)
     {
         var user = await context.Users
             .AsNoTracking()
-            .Where(u => u.Email == email).FirstOrDefaultAsync();
+            .Where(u => u.Email == email).FirstOrDefaultAsync(ct);
 
-        if (user == null)
-        {
-            return Result<User>.Failure(new Error(404, "Not Found", $"User with email: {email} was not found"));
-        }
-
-        return Result<User>.Success(user);
+        return user;
     }
 
-    public async Task<Result<User>> CreateUserAsync(User user)
+    public async Task CreateUserAsync(User user, CancellationToken ct = default)
     {
-        await context.Users.AddAsync(user);
-        await context.SaveChangesAsync();
-
-        return Result<User>.Success(user);
+        await context.Users.AddAsync(user, ct);
     }
 }

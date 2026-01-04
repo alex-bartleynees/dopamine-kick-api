@@ -1,6 +1,6 @@
+using Common.Abstractions;
 using Common.Infrastructure.Interceptors;
 using FluentValidation;
-using Mediator;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,6 +48,7 @@ public static class UsersModule
         });
 
         services.AddScoped<IUsersRepository, UsersRepository>();
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<UsersContext>());
 
         services.AddScoped<IValidator<UserForCreationDto>, UserForCreationDtoValidator>();
 
@@ -56,7 +57,7 @@ public static class UsersModule
             options.Namespace = "Users.Api.Mediator";
             options.ServiceLifetime = ServiceLifetime.Scoped;
         });
-     
+
         return services;
     }
 }

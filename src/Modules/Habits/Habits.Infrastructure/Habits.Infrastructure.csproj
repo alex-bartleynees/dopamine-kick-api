@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Habits.Application\Habits.Application.csproj" />
     <ProjectReference Include="..\Habits.Domain\Habits.Domain.csproj" />
   </ItemGroup>
 

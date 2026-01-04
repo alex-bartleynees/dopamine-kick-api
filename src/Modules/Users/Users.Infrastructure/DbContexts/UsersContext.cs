@@ -1,3 +1,4 @@
+using Common.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Users.Domain.Entities;
@@ -5,7 +6,7 @@ using Users.Infrastructure.Configuration;
 
 namespace Users.Infrastructure.DbContexts;
 
-public class UsersContext(IConfiguration configuration) : DbContext
+public class UsersContext(IConfiguration configuration) : DbContext, IUnitOfWork
 {
    public DbSet<User> Users { get; set; }
 
