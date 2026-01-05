@@ -38,6 +38,7 @@ public static class HabitsModule
 
         services.AddScoped<IValidator<HabitForCreationDto>, HabitForCreationDtoValidator>();
         services.AddScoped<IValidator<BulkHabitsForCreationDto>, BulkHabitsForCreationDtoValidator>();
+        services.AddScoped<IValidator<HabitForCompletionDto>, HabitForCompletionDtoValidator>();
         services.AddScoped<HabitForCreationDtoValidator>();
 
         services.AddMediator(options =>
