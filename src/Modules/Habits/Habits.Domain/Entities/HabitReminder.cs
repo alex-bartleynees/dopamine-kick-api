@@ -17,7 +17,7 @@ public class HabitReminder : IAuditable
     public string PreferredTime { get; set; } = string.Empty;
     
     public bool IsEnabled { get; set; }
-    public DateTimeOffset CreatedAt { get; private set; }
+    public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
 
     public Habit Habit { get; set; } = null!;

@@ -24,4 +24,16 @@ public class HabitsRepository(HabitsContext context) : IHabitsRepository
     {
         await context.Habits.AddRangeAsync(habits, ct);
     }
+
+    public async Task<Habit?> GetHabitByIdAsync(Guid userId, Guid habitId, CancellationToken ct = default)
+    {
+        return await context.Habits
+            .Where(h => h.UserId == userId && h.Id == habitId)
+            .FirstOrDefaultAsync(ct);
+    }
+
+    public async Task CreateHabitCompletionAsync(HabitCompletion habitCompletion, CancellationToken ct = default)
+    {
+        await context.HabitCompletions.AddAsync(habitCompletion, ct);
+    }
 }

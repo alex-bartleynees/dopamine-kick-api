@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
@@ -15,6 +16,12 @@ public class HabitsContextFactory : IDesignTimeDbContextFactory<HabitsContext>
             .AddEnvironmentVariables()
             .Build();
 
-        return new HabitsContext(configuration);
+        var connectionString = configuration.GetConnectionString("HabitsDBConnectionString")
+            ?? throw new InvalidOperationException("Connection string not found");
+
+        var optionsBuilder = new DbContextOptionsBuilder<HabitsContext>();
+        optionsBuilder.UseNpgsql(connectionString);
+
+        return new HabitsContext(optionsBuilder.Options);
     }
 }

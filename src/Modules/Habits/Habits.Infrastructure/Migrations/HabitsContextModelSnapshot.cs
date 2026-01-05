@@ -69,7 +69,7 @@ namespace Habits.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Habits");
+                    b.ToTable("Habits", (string)null);
                 });
 
             modelBuilder.Entity("Habits.Domain.Entities.HabitCompletion", b =>
@@ -94,7 +94,7 @@ namespace Habits.Infrastructure.Migrations
                     b.HasIndex("HabitId", "CompletedDate")
                         .IsUnique();
 
-                    b.ToTable("HabitCompletions");
+                    b.ToTable("HabitCompletions", (string)null);
                 });
 
             modelBuilder.Entity("Habits.Domain.Entities.HabitReminder", b =>
@@ -138,7 +138,7 @@ namespace Habits.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("HabitReminders");
+                    b.ToTable("HabitReminders", (string)null);
                 });
 
             modelBuilder.Entity("Habits.Domain.Entities.HabitCompletion", b =>

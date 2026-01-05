@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1.7-labs
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS base
+RUN apk add --no-cache tzdata
 WORKDIR /app
 EXPOSE 5009
 

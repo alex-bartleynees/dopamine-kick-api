@@ -14,7 +14,7 @@ public class User : IAuditable
 
     public string Image { get; set; } = string.Empty;
     
-    public DateTimeOffset CreatedAt { get; private set; }
+    public DateTimeOffset CreatedAt { get; set; }
     
     public DateTimeOffset UpdatedAt { get; set; }
 

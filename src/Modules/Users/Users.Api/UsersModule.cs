@@ -1,4 +1,3 @@
-using Common.Abstractions;
 using Common.Infrastructure.Interceptors;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -48,7 +47,7 @@ public static class UsersModule
         });
 
         services.AddScoped<IUsersRepository, UsersRepository>();
-        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<UsersContext>());
+        services.AddScoped<IUsersUnitOfWork>(sp => sp.GetRequiredService<UsersContext>());
 
         services.AddScoped<IValidator<UserForCreationDto>, UserForCreationDtoValidator>();
 

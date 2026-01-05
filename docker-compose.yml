@@ -3,7 +3,7 @@ services:
     image: postgres:17
     container_name: postgres17
     environment:
-      POSTGRES_DB: suggestionsdb
+      POSTGRES_DB: dopamine-kick-db
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:

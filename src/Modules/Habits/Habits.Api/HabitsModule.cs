@@ -1,4 +1,3 @@
-﻿using Common.Abstractions;
 using Common.Infrastructure.Interceptors;
 using FluentValidation;
 using Habits.Application.Abstractions;
@@ -35,7 +34,7 @@ public static class HabitsModule
                 .AddInterceptors(sp.GetRequiredService<AuditableEntityInterceptor>()));
 
         services.AddScoped<IHabitsRepository, HabitsRepository>();
-        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<HabitsContext>());
+        services.AddScoped<IHabitsUnitOfWork>(sp => sp.GetRequiredService<HabitsContext>());
 
         services.AddScoped<IValidator<HabitForCreationDto>, HabitForCreationDtoValidator>();
         services.AddScoped<IValidator<BulkHabitsForCreationDto>, BulkHabitsForCreationDtoValidator>();

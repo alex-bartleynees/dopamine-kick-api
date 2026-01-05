@@ -18,8 +18,4 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="10.1.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Habits\Queries\" />
-  </ItemGroup>
-
 </Project>

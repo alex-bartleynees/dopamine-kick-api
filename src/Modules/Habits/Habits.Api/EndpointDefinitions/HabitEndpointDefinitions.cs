@@ -22,8 +22,10 @@ public class HabitEndpointDefinitions : IEndpointDefinition
             .RequireAuthorization();
 
         habits.MapGet("", GetMyHabits);
+        habits.MapGet("{habitId}", GetHabitById);
         habits.MapPost("", CreateHabit);
         habits.MapPost("bulk", BulkCreateHabits);
+        habits.MapPost("{habitId}/completions", MarkHabitCompleted);
     }
 
     private async Task<Results<Ok<List<Habit>>, BadRequest<Error>>> GetMyHabits(
@@ -38,6 +40,28 @@ public class HabitEndpointDefinitions : IEndpointDefinition
 
         var query = new GetMyHabits(userId.Value);
         var result = await mediator.Send(query);
+
+        return TypedResults.Ok(result.ValueOrThrow);
+    }
+    
+    private async Task<Results<Ok<Habit>, NotFound<Error>, BadRequest<Error>>> GetHabitById(
+        Habits.Api.Mediator.Mediator mediator,
+        ClaimsPrincipal user,
+        Guid habitId)
+    {
+        var userId = user.GetUserId();
+        if (userId is null)
+        {
+            return TypedResults.BadRequest(new Error(400, "BadRequest", "User ID not found in claims"));
+        }
+
+        var query = new GetHabitById(userId.Value, habitId);
+        var result = await mediator.Send(query);
+
+        if (result.IsFailure)
+        {
+            return TypedResults.NotFound(result.Error);
+        }
 
         return TypedResults.Ok(result.ValueOrThrow);
     }
@@ -84,5 +108,28 @@ public class HabitEndpointDefinitions : IEndpointDefinition
         }
 
         return TypedResults.Created("/api/habits", result.ValueOrThrow);
+    }
+
+    private async Task<Results<Created<HabitCompletion>, BadRequest<Error>>> MarkHabitCompleted(
+        Habits.Api.Mediator.Mediator mediator,
+        ClaimsPrincipal user,
+        HabitForCompletionDto request
+    )
+    {
+        var userId = user.GetUserId();
+        if (userId is null)
+        {
+            return TypedResults.BadRequest(new Error(400, "BadRequest", "User ID not found in claims"));
+        }
+
+        var command = new CreateHabitCompletion(userId.Value, request.HabitId, request.Timezone);
+        var result = await mediator.Send(command);
+
+        if (result.IsFailure)
+        {
+            return TypedResults.BadRequest(result.Error);
+        }
+
+        return TypedResults.Created($"/api/habits/{request.HabitId}", result.ValueOrThrow);
     }
 }

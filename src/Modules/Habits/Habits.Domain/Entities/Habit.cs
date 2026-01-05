@@ -20,6 +20,6 @@ public class Habit : IAuditable
 
     public DateOnly? LastCompletedDate { get; set; }
 
-    public DateTimeOffset CreatedAt { get; private set; }
+    public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
 }

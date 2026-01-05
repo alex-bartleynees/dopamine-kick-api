@@ -1,5 +1,4 @@
 using Ardalis.GuardClauses;
-using Common.Abstractions;
 using Common.Abstractions.Results;
 using Mediator;
 using Users.Application.Abstractions;
@@ -13,10 +12,10 @@ public record CreateUser(UserForCreationDto User) : IRequest<Result<User>>;
 public class CreateUserHandler : IRequestHandler<CreateUser, Result<User>>
 {
     private readonly IUsersRepository _usersRepository;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IUsersUnitOfWork _unitOfWork;
     private readonly IKeycloakService _keycloakService;
 
-    public CreateUserHandler(IUsersRepository usersRepository, IUnitOfWork unitOfWork, IKeycloakService keycloakService)
+    public CreateUserHandler(IUsersRepository usersRepository, IUsersUnitOfWork unitOfWork, IKeycloakService keycloakService)
     {
         _usersRepository = usersRepository ?? throw new ArgumentNullException(nameof(usersRepository));
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));

@@ -1,4 +1,3 @@
-using Common.Abstractions;
 using Common.Abstractions.Results;
 using Habits.Application.Abstractions;
 using Habits.Application.Common.Models;
@@ -12,9 +11,9 @@ public record BulkCreateHabits(Guid UserId, List<HabitForCreationDto> Habits) : 
 public class BulkCreateHabitsHandler : IRequestHandler<BulkCreateHabits, Result<List<Habit>>>
 {
     private readonly IHabitsRepository _habitsRepository;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IHabitsUnitOfWork _unitOfWork;
 
-    public BulkCreateHabitsHandler(IHabitsRepository habitsRepository, IUnitOfWork unitOfWork)
+    public BulkCreateHabitsHandler(IHabitsRepository habitsRepository, IHabitsUnitOfWork unitOfWork)
     {
         _habitsRepository = habitsRepository;
         _unitOfWork = unitOfWork;

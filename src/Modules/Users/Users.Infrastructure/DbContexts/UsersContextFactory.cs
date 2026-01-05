@@ -16,6 +16,12 @@ public class UsersContextFactory : IDesignTimeDbContextFactory<UsersContext>
             .AddEnvironmentVariables()
             .Build();
 
-        return new UsersContext(configuration);
+        var connectionString = configuration.GetConnectionString("UsersDBConnectionString")
+            ?? throw new InvalidOperationException("Connection string not found");
+
+        var optionsBuilder = new DbContextOptionsBuilder<UsersContext>();
+        optionsBuilder.UseNpgsql(connectionString);
+
+        return new UsersContext(optionsBuilder.Options);
     }
 }
