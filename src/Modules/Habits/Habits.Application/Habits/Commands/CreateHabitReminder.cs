@@ -39,7 +39,7 @@ public class CreateHabitReminderHandler(IHabitsRepository habitsRepository, IHab
             var outboxMessage = new OutboxMessage
             {
                 MessageId = messageId,
-                Type = nameof(HabitReminderCreated),
+                Type = typeof(HabitReminderCreated).AssemblyQualifiedName!,
                 Payload = JsonSerializer.Serialize(new HabitReminderCreated(
                     messageId,
                     reminder.Id,

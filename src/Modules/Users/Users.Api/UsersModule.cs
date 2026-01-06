@@ -55,6 +55,7 @@ public static class UsersModule
         {
             options.Namespace = "Users.Api.Mediator";
             options.ServiceLifetime = ServiceLifetime.Scoped;
+            options.GenerateTypesAsInternal = true;
         });
 
         return services;

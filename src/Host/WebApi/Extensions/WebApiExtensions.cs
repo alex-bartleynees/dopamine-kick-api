@@ -1,4 +1,6 @@
 using Common.Abstractions;
+using Common.Abstractions.Messaging;
+using Common.Infrastructure.Messaging;
 using Habits.Api;
 using Microsoft.OpenApi;
 using SharpGrip.FluentValidation.AutoValidation.Endpoints.Extensions;
@@ -45,6 +47,13 @@ public static class WebApiExtensions
 
         builder.Services.AddUsersModule(builder.Configuration);
         builder.Services.AddHabitsModule(builder.Configuration);
+
+        // Register RabbitMQ Options and Services
+        builder.Services.Configure<RabbitMqOptions>(
+            builder.Configuration.GetSection(RabbitMqOptions.SectionName));
+        builder.Services.AddSingleton<IRabbitMqConnectionFactory, RabbitMqConnectionFactory>();
+        builder.Services.AddSingleton<IMessagePublisher, RabbitMqPublisher>();
+        builder.Services.AddTransient<IMessageConsumer, RabbitMqConsumer>();
 
         // Add HybridCache service
         builder.Services.AddHybridCache();

@@ -1,8 +1,11 @@
+using Common.Abstractions.Messaging;
 using Common.Infrastructure.Interceptors;
+using Common.Infrastructure.Messaging;
 using FluentValidation;
 using Habits.Application.Abstractions;
 using Habits.Application.Common.Models;
 using Habits.Application.Common.Validators;
+using Habits.Infrastructure.BackgroundServices;
 using Habits.Infrastructure.DbContexts;
 using Habits.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -48,7 +51,11 @@ public static class HabitsModule
         {
             options.Namespace = "Habits.Api.Mediator";
             options.ServiceLifetime = ServiceLifetime.Scoped;
+            options.GenerateTypesAsInternal = true;
         });
+
+        // Register OutboxPublisher hosted service
+        services.AddHostedService<OutboxPublisher>();
 
         return services;
     }

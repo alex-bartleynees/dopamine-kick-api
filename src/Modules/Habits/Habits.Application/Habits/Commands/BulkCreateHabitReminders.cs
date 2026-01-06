@@ -40,7 +40,7 @@ public class BulkCreateHabitRemindersHandler : IRequestHandler<BulkCreateHabitRe
             return new OutboxMessage
             {
                 MessageId = messageId,
-                Type = nameof(HabitReminderCreated),
+                Type = typeof(HabitReminderCreated).AssemblyQualifiedName!,
                 Payload = JsonSerializer.Serialize(new HabitReminderCreated(
                     messageId,
                     reminder.Id,
