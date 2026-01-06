@@ -23,7 +23,6 @@ public class BulkCreateHabitsHandler : IRequestHandler<BulkCreateHabits, Result<
     {
         var habits = request.Habits.Select(dto => new Habit
         {
-            Id = Guid.NewGuid(),
             UserId = request.UserId,
             Name = dto.Name,
             Emoji = dto.Emoji,

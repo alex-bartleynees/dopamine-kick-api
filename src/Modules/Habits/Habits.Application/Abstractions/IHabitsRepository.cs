@@ -9,4 +9,8 @@ public interface IHabitsRepository
     Task CreateBulkAsync(List<Habit> habits, CancellationToken ct = default);
     Task<Habit?> GetHabitByIdAsync(Guid userId, Guid habitId, CancellationToken ct = default);
     Task CreateHabitCompletionAsync(HabitCompletion habitCompletion, CancellationToken ct = default);
+    Task CreateReminderAsync(HabitReminder reminder, CancellationToken ct = default);
+    Task CreateBulkRemindersAsync(List<HabitReminder> reminders, CancellationToken ct = default);
+    Task CreateOutboxMessageAsync(OutboxMessage message, CancellationToken ct = default);
+    Task CreateBulkOutboxMessagesAsync(List<OutboxMessage> messages, CancellationToken ct = default);
 }

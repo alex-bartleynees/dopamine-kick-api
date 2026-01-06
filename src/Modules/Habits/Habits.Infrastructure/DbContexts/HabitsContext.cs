@@ -13,6 +13,8 @@ public class HabitsContext(DbContextOptions<HabitsContext> options) : DbContext(
 
     public DbSet<HabitReminder> HabitReminders { get; set; }
 
+    public DbSet<OutboxMessage> OutboxMessages { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(HabitConfiguration).Assembly);

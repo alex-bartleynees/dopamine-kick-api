@@ -36,4 +36,24 @@ public class HabitsRepository(HabitsContext context) : IHabitsRepository
     {
         await context.HabitCompletions.AddAsync(habitCompletion, ct);
     }
+
+    public async Task CreateReminderAsync(HabitReminder reminder, CancellationToken ct = default)
+    {
+        await context.HabitReminders.AddAsync(reminder, ct);
+    }
+
+    public async Task CreateBulkRemindersAsync(List<HabitReminder> reminders, CancellationToken ct = default)
+    {
+        await context.HabitReminders.AddRangeAsync(reminders, ct);
+    }
+
+    public async Task CreateOutboxMessageAsync(OutboxMessage message, CancellationToken ct = default)
+    {
+        await context.OutboxMessages.AddAsync(message, ct);
+    }
+
+    public async Task CreateBulkOutboxMessagesAsync(List<OutboxMessage> messages, CancellationToken ct = default)
+    {
+        await context.OutboxMessages.AddRangeAsync(messages, ct);
+    }
 }

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\Common.Abstractions\Common.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Common.IntegrationEvents\Common.IntegrationEvents.csproj" />
     <ProjectReference Include="..\Habits.Domain\Habits.Domain.csproj" />
   </ItemGroup>
 

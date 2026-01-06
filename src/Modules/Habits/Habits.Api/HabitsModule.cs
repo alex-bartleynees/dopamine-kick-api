@@ -39,7 +39,10 @@ public static class HabitsModule
         services.AddScoped<IValidator<HabitForCreationDto>, HabitForCreationDtoValidator>();
         services.AddScoped<IValidator<BulkHabitsForCreationDto>, BulkHabitsForCreationDtoValidator>();
         services.AddScoped<IValidator<HabitForCompletionDto>, HabitForCompletionDtoValidator>();
+        services.AddScoped<IValidator<HabitReminderForCreationDto>, HabitReminderForCreationDtoValidator>();
+        services.AddScoped<IValidator<BulkHabitRemindersForCreationDto>, BulkHabitRemindersForCreationDtoValidator>();
         services.AddScoped<HabitForCreationDtoValidator>();
+        services.AddScoped<HabitReminderForCreationDtoValidator>();
 
         services.AddMediator(options =>
         {

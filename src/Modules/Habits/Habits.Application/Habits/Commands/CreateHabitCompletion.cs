@@ -24,7 +24,6 @@ public class CreateHabitCompletionHandler(IHabitsRepository habitsRepository, IH
         var today = DateOnly.FromDateTime(userLocalTime.DateTime);
         var habitForCompletion = new HabitCompletion
         {
-            Id = Guid.NewGuid(),
             HabitId = request.HabitId,
             CompletedDate = today,
             CompletedAt = now

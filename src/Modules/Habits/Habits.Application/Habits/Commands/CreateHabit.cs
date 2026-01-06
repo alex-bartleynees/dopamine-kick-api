@@ -23,7 +23,6 @@ public class CreateHabitHandler : IRequestHandler<CreateHabit, Result<Habit>>
     {
         var habit = new Habit
         {
-            Id = Guid.NewGuid(),
             UserId = request.UserId,
             Name = request.Habit.Name,
             Emoji = request.Habit.Emoji,
