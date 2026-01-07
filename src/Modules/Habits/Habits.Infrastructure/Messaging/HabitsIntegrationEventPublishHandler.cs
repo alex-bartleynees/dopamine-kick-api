@@ -2,11 +2,15 @@ using Common.Abstractions.Messaging;
 using Mediator;
 using Microsoft.Extensions.Logging;
 
-namespace Common.Infrastructure.Messaging;
+namespace Habits.Infrastructure.Messaging;
 
-public class IntegrationEventPublishHandler<TEvent>(
+/// <summary>
+/// Habits module-specific integration event publisher.
+/// Publishes integration events from the Habits module's outbox to RabbitMQ.
+/// </summary>
+public class HabitsIntegrationEventPublishHandler<TEvent>(
     IMessagePublisher messagePublisher,
-    ILogger<IntegrationEventPublishHandler<TEvent>> logger)
+    ILogger<HabitsIntegrationEventPublishHandler<TEvent>> logger)
     : INotificationHandler<TEvent>
     where TEvent : IntegrationEvent, INotification
 {

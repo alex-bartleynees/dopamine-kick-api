@@ -20,6 +20,12 @@ public class CreateHabitReminderHandler(IHabitsRepository habitsRepository, IHab
 {
     public async ValueTask<Result<Guid>> Handle(CreateHabitReminder command, CancellationToken cancellationToken)
     {
+        var habit = await habitsRepository.GetHabitByIdAsync(command.UserId, command.HabitId, cancellationToken);
+        if (habit == null)
+        {
+            return Result<Guid>.Failure(new Error(404, "Not Found", $"Habit with id: {command.HabitId} was not found"));
+        }
+        
         var reminder = new HabitReminder
         {
             Id = Guid.NewGuid(),
@@ -45,7 +51,10 @@ public class CreateHabitReminderHandler(IHabitsRepository habitsRepository, IHab
                     reminder.Id,
                     reminder.UserId,
                     reminder.NotificationTime,
-                    reminder.TimeZone
+                    reminder.TimeZone,
+                    habit.Name,
+                    habit.Emoji,
+                    habit.Target
                 )),
                 Published = false
             };

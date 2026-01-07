@@ -10,19 +10,25 @@ namespace Habits.Application.Habits.Commands;
 
 public record BulkCreateHabitReminders(Guid UserId, List<HabitReminderForCreationDto> Reminders) : IRequest<Result<List<Guid>>>;
 
-public class BulkCreateHabitRemindersHandler : IRequestHandler<BulkCreateHabitReminders, Result<List<Guid>>>
+public class BulkCreateHabitRemindersHandler(IHabitsRepository habitsRepository, IHabitsUnitOfWork unitOfWork)
+    : IRequestHandler<BulkCreateHabitReminders, Result<List<Guid>>>
 {
-    private readonly IHabitsRepository _habitsRepository;
-    private readonly IHabitsUnitOfWork _unitOfWork;
-
-    public BulkCreateHabitRemindersHandler(IHabitsRepository habitsRepository, IHabitsUnitOfWork unitOfWork)
-    {
-        _habitsRepository = habitsRepository;
-        _unitOfWork = unitOfWork;
-    }
-
     public async ValueTask<Result<List<Guid>>> Handle(BulkCreateHabitReminders request, CancellationToken cancellationToken)
     {
+        var userHabits = await habitsRepository.GetByUserIdAsync(request.UserId, cancellationToken);
+        var habitsById = userHabits.ToDictionary(h => h.Id);
+        var invalidHabitIds = request.Reminders.Select(r => r.HabitId)
+            .Where(habitId => !habitsById.ContainsKey(habitId)).ToList();
+
+        if (invalidHabitIds.Count != 0)
+        {
+            return Result<List<Guid>>.Failure(
+                new Error(
+                    400,
+                    "Invalid Habit IDs",
+                    $"The following habit IDs do not exist: {string.Join(", ", invalidHabitIds)}"));
+        }
+
         var reminders = request.Reminders.Select(dto => new HabitReminder
         {
             Id = Guid.NewGuid(),
@@ -36,6 +42,7 @@ public class BulkCreateHabitRemindersHandler : IRequestHandler<BulkCreateHabitRe
 
         var outboxMessages = reminders.Where(r => r.IsEnabled).Select(reminder =>
         {
+            var habit = habitsById[reminder.HabitId];
             var messageId = Guid.NewGuid();
             return new OutboxMessage
             {
@@ -46,20 +53,23 @@ public class BulkCreateHabitRemindersHandler : IRequestHandler<BulkCreateHabitRe
                     reminder.Id,
                     reminder.UserId,
                     reminder.NotificationTime,
-                    reminder.TimeZone
+                    reminder.TimeZone,
+                    habit.Name,
+                    habit.Emoji,
+                    habit.Target
                 )),
                 Published = false
             };
         }).ToList();
 
-        await _habitsRepository.CreateBulkRemindersAsync(reminders, cancellationToken);
+        await habitsRepository.CreateBulkRemindersAsync(reminders, cancellationToken);
 
         if (outboxMessages.Count > 0)
         {
-            await _habitsRepository.CreateBulkOutboxMessagesAsync(outboxMessages, cancellationToken);
+            await habitsRepository.CreateBulkOutboxMessagesAsync(outboxMessages, cancellationToken);
         }
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<List<Guid>>.Success(reminders.Select(r => r.Id).ToList());
     }

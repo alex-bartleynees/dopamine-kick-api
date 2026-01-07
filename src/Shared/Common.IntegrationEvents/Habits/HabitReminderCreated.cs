@@ -9,4 +9,7 @@ public record HabitReminderCreated(
     Guid ReminderId,
     Guid UserId,
     TimeOnly NotificationTime,
-    string TimeZone) : IntegrationEvent, INotification;
+    string TimeZone,
+    string HabitName,
+    string HabitEmoji,
+    string HabitTarget) : IntegrationEvent, INotification;

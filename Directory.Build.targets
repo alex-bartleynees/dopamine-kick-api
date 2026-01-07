@@ -1,0 +1,43 @@
+<Project>
+
+  <!-- Module Boundary Validation -->
+  <Target Name="ValidateModuleBoundaries" BeforeTargets="BeforeBuild">
+
+    <!-- Define module names -->
+    <PropertyGroup>
+      <ModuleNames>Users;Habits;Notifications</ModuleNames>
+    </PropertyGroup>
+
+    <!-- Detect which module this project belongs to -->
+    <PropertyGroup>
+      <CurrentModule></CurrentModule>
+      <CurrentModule Condition="$(MSBuildProjectDirectory.Contains('Modules\Users'))">Users</CurrentModule>
+      <CurrentModule Condition="$(MSBuildProjectDirectory.Contains('Modules\Habits'))">Habits</CurrentModule>
+      <CurrentModule Condition="$(MSBuildProjectDirectory.Contains('Modules\Notifications'))">Notifications</CurrentModule>
+      <CurrentModule Condition="$(MSBuildProjectDirectory.Contains('Modules/Users'))">Users</CurrentModule>
+      <CurrentModule Condition="$(MSBuildProjectDirectory.Contains('Modules/Habits'))">Habits</CurrentModule>
+      <CurrentModule Condition="$(MSBuildProjectDirectory.Contains('Modules/Notifications'))">Notifications</CurrentModule>
+    </PropertyGroup>
+
+    <!-- Only validate if this is a module project -->
+    <ItemGroup Condition="'$(CurrentModule)' != ''">
+      <!-- Check for cross-module references (using forward and back slashes) -->
+      <_ModuleBoundaryViolations Include="@(ProjectReference)"
+                                  Condition="($([System.String]::Copy('%(Identity)').Contains('\Users\')) Or $([System.String]::Copy('%(Identity)').Contains('/Users/'))) And '$(CurrentModule)' != 'Users'" />
+      <_ModuleBoundaryViolations Include="@(ProjectReference)"
+                                  Condition="($([System.String]::Copy('%(Identity)').Contains('\Habits\')) Or $([System.String]::Copy('%(Identity)').Contains('/Habits/'))) And '$(CurrentModule)' != 'Habits'" />
+      <_ModuleBoundaryViolations Include="@(ProjectReference)"
+                                  Condition="($([System.String]::Copy('%(Identity)').Contains('\Notifications\')) Or $([System.String]::Copy('%(Identity)').Contains('/Notifications/'))) And '$(CurrentModule)' != 'Notifications'" />
+    </ItemGroup>
+
+    <!-- Fail build if violations found -->
+    <Error Condition="'@(_ModuleBoundaryViolations)' != ''"
+           Text="MODULE BOUNDARY VIOLATION: '$(MSBuildProjectName)' in module '$(CurrentModule)' cannot reference other modules. Invalid reference(s): @(_ModuleBoundaryViolations)" />
+
+    <Message Condition="'$(CurrentModule)' != '' And '@(_ModuleBoundaryViolations)' == ''"
+             Text="Module boundary check passed for $(CurrentModule).$(MSBuildProjectName)"
+             Importance="low" />
+
+  </Target>
+
+</Project>

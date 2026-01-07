@@ -14,7 +14,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common.Abstractions\Common.Abstractions.csproj" />
-    <ProjectReference Include="..\Common.IntegrationEvents\Common.IntegrationEvents.csproj" />
   </ItemGroup>
 
 </Project>
