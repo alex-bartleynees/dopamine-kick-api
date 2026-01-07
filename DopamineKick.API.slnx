@@ -10,6 +10,10 @@
     <Project Path="src/Modules/Habits/Habits.Domain/Habits.Domain.csproj" />
     <Project Path="src/Modules/Habits/Habits.Infrastructure/Habits.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/Modules/Notifications/">
+    <Project Path="src/Modules/Notifications/Notifications.Application/Notifications.Application.csproj" />
+    <Project Path="src/Modules/Notifications/Notifications.Infrastructure/Notifications.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/src/Modules/Users/">
     <Project Path="src/Modules/Users/Users.Api/Users.Api.csproj" />
     <Project Path="src/Modules/Users/Users.Application/Users.Application.csproj" />

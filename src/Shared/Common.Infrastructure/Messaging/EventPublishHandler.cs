@@ -8,7 +8,7 @@ public class IntegrationEventPublishHandler<TEvent>(
     IMessagePublisher messagePublisher,
     ILogger<IntegrationEventPublishHandler<TEvent>> logger)
     : INotificationHandler<TEvent>
-    where TEvent : class, INotification
+    where TEvent : IntegrationEvent, INotification
 {
     public async ValueTask Handle(TEvent notification, CancellationToken ct)
     {

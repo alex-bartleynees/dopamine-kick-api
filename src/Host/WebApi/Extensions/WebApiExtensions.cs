@@ -3,6 +3,7 @@ using Common.Abstractions.Messaging;
 using Common.Infrastructure.Messaging;
 using Habits.Api;
 using Microsoft.OpenApi;
+using Notifications.Infrastructure;
 using SharpGrip.FluentValidation.AutoValidation.Endpoints.Extensions;
 using StackExchange.Redis;
 using Users.Api;
@@ -47,6 +48,7 @@ public static class WebApiExtensions
 
         builder.Services.AddUsersModule(builder.Configuration);
         builder.Services.AddHabitsModule(builder.Configuration);
+        builder.Services.AddNotificationsModule();
 
         // Register RabbitMQ Options and Services
         builder.Services.Configure<RabbitMqOptions>(
