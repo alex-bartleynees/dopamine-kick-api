@@ -48,7 +48,7 @@ public static class WebApiExtensions
 
         builder.Services.AddUsersModule(builder.Configuration);
         builder.Services.AddHabitsModule(builder.Configuration);
-        builder.Services.AddNotificationsModule();
+        builder.Services.AddNotificationsModule(builder.Configuration);
 
         // Register RabbitMQ Options and Services
         builder.Services.Configure<RabbitMqOptions>(
@@ -108,6 +108,7 @@ public static class WebApiExtensions
     {
         app.Services.MigrateUsersDatabase();
         app.Services.MigrateHabitsDatabase();
+        app.Services.MigrateNotificationsDatabase();
 
         if (app.Environment.IsDevelopment())
         {

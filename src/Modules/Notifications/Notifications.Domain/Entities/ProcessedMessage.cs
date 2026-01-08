@@ -4,6 +4,8 @@ namespace Notifications.Domain.Entities;
 
 public class ProcessedMessage : IAuditable
 {
+    public Guid Id { get; set; }
+    
     public Guid MessageId { get; set; }
     
     public string MessageType { get; set; } = string.Empty;
