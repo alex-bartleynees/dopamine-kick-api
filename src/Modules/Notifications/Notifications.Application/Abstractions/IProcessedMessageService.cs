@@ -1,4 +1,4 @@
-namespace Habits.Application.Abstractions;
+namespace Notifications.Application.Abstractions;
 
 public interface IProcessedMessageService
 {

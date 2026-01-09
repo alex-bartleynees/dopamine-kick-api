@@ -1,6 +1,5 @@
 using Common.Abstractions.Messaging;
 using Common.IntegrationEvents.Habits;
-using Habits.Application.Abstractions;
 using Microsoft.Extensions.Logging;
 using Notifications.Application.Abstractions;
 

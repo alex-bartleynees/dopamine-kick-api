@@ -2,7 +2,6 @@ using Common.Abstractions.Messaging;
 using Common.Infrastructure.Interceptors;
 using Common.Infrastructure.Messaging;
 using Common.IntegrationEvents.Habits;
-using Habits.Application.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
