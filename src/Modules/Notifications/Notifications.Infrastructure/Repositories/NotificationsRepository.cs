@@ -19,6 +19,14 @@ public class NotificationsRepository(NotificationsContext context) : INotificati
             .FirstOrDefaultAsync(ct);
     }
 
+    public async Task<WebPushSubscription?> GetByUserIdAndEndpointAsync(Guid userId, string endpoint, CancellationToken ct = default)
+    {
+        return await context.WebPushSubscriptions
+            .AsNoTracking()
+            .Where(s => s.UserId == userId && s.Endpoint == endpoint)
+            .FirstOrDefaultAsync(ct);
+    }
+
     public void Delete(WebPushSubscription subscription)
     {
         context.WebPushSubscriptions.Remove(subscription);

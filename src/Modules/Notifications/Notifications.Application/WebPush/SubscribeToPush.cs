@@ -18,6 +18,14 @@ public class SubscribeToPushCommandHandler(
 {
     public async ValueTask<Result> Handle(SubscribeToPushCommand request, CancellationToken cancellationToken)
     {
+        var existingSubscription =
+            await repository.GetByUserIdAndEndpointAsync(request.UserId, request.Endpoint, cancellationToken);
+
+        if (existingSubscription is not null)
+        {
+            return Result.Failure(new Error(409, "Conflict", "Subscription already exists"));
+        }
+
         var subscription = new WebPushSubscription
         {
             UserId = request.UserId,
