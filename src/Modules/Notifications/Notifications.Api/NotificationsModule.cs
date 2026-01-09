@@ -73,6 +73,8 @@ public static class NotificationsModule
         services.AddScoped<IJobScheduler, JobSchedulerService>();
         services.AddScoped<IProcessedMessageService, ProcessedMessageService>();
         services.AddScoped<IWebPushService, WebPushService>();
+        services.Configure<WebPushOptions>(
+            configuration.GetSection(WebPushOptions.SectionName));
         
         services.AddMediator(options =>
         {

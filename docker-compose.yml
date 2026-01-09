@@ -66,6 +66,9 @@ services:
       ConnectionStrings__NotificationsDBConnectionString: "Host=postgres;Port=5432;Database=notificationsdb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}"
       ConnectionStrings__RedisConnection: "redis:6379"
       ConnectionStrings__OTLP_Endpoint: "http://otel-collector:4317"
+      WebPush__PrivateKey: ${VAPID_PRIVATE_KEY}
+      WebPush__PublicKey: ${VAPID_PUBLIC_KEY}
+      WebPush__Subject: ${VAPID_SUBJECT}
       RabbitMQ__HostName: "rabbitmq"
       RabbitMQ__Port: 5672
       RabbitMQ__UserName: "alexbn"

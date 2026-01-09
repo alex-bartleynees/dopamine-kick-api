@@ -19,10 +19,10 @@ public class NotificationEndpointDefinitions : IEndpointDefinition
         var notifications = app.MapGroup("api/notifications");
 
         notifications.MapGet("vapid-public-key",
-                (IOptions<WebPushOptions> options) => options.Value.PublicKey)
+                (IOptions<WebPushOptions> options) => new { publicKey = options.Value.PublicKey })
             .AllowAnonymous();
 
-        notifications.MapPost("/subscriptions", SubscribeToPush).RequireAuthorization();
+        notifications.MapPost("/subscriptions", SubscribeToPush).RequireAuthorization().DisableAntiforgery();
         notifications.MapDelete("subscriptions/{id:guid}", UnsubscribeFromPush).RequireAuthorization();
     }
 
