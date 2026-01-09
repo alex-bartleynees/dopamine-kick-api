@@ -1,5 +1,4 @@
 using Common.Abstractions.Messaging;
-using Mediator;
 
 namespace Common.IntegrationEvents.Habits;
 
@@ -12,4 +11,4 @@ public record HabitReminderCreated(
     string TimeZone,
     string HabitName,
     string HabitEmoji,
-    string HabitTarget) : IntegrationEvent, INotification;
+    string HabitTarget) : IntegrationEvent;

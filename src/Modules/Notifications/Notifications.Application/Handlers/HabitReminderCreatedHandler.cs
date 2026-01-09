@@ -1,21 +1,29 @@
-using System.Text.Json;
 using Common.Abstractions.Messaging;
 using Common.IntegrationEvents.Habits;
+using Habits.Application.Abstractions;
 using Microsoft.Extensions.Logging;
+using Notifications.Application.Abstractions;
 
 namespace Notifications.Application.Handlers;
 
-public class HabitReminderCreatedHandler(ILogger<HabitReminderCreatedHandler> logger)
+public class HabitReminderCreatedHandler(
+    IProcessedMessageService processedMessageService,
+    IJobScheduler jobScheduler,
+    ILogger<HabitReminderCreatedHandler> logger)
     : IIntegrationEventHandler<HabitReminderCreated>
 {
     public async Task HandleAsync(HabitReminderCreated @event, CancellationToken cancellationToken = default)
     {
-        var eventDetails = JsonSerializer.Serialize(@event, new JsonSerializerOptions { WriteIndented = true });
-        logger.LogInformation("Processing HabitReminderCreated event: {EventDetails}", eventDetails);
-        logger.LogInformation($"{@event.HabitEmoji} Time to complete your '{@event.HabitName}' habit!");
+        if (await processedMessageService.IsMessageProcessedAsync(@event.MessageId))
+        {
+            logger.LogInformation("Message {MessageId} already processed, skipping", @event.MessageId);
+            return;
+        }
 
-        // TODO: Implement actual notification logic (email, push, SMS, etc.)
+        await jobScheduler.ScheduleHabitReminderAsync(@event);
 
-        await Task.CompletedTask;
+        await processedMessageService.MarkAsProcessedAsync(
+            @event.MessageId,
+            nameof(HabitReminderCreated));
     }
 }

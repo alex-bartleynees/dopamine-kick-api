@@ -1,6 +1,4 @@
-using Common.Abstractions.Messaging;
 using Common.Infrastructure.Interceptors;
-using Common.Infrastructure.Messaging;
 using FluentValidation;
 using Habits.Application.Abstractions;
 using Habits.Application.Common.Models;

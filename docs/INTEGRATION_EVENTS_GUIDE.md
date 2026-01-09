@@ -9,10 +9,9 @@ The project uses an **Outbox Pattern** with **RabbitMQ** for reliable event publ
 ### Architecture Flow
 
 1. Command Handler → Creates OutboxMessage → Saves to DB
-2. OutboxPublisher (background service) → Polls DB → Publishes to Mediator
-3. IntegrationEventPublishHandler → Publishes to RabbitMQ
-4. RabbitMQ → Routes to Queue(s)
-5. Consumer Service → Delegates to Handler → Processes Event → Acknowledges
+2. OutboxPublisher (background service) → Polls DB → Publishes directly to RabbitMQ
+3. RabbitMQ → Routes to Queue(s)
+4. Consumer Service → Delegates to Handler → Processes Event → Acknowledges
 
 ### Recommended Pattern: IIntegrationEventHandler<TEvent>
 
@@ -68,7 +67,7 @@ See Step 9 for detailed implementation instructions.
 
 ## Step 1: Define the Integration Event
 
-Create a new event class that inherits from `IntegrationEvent` and implements `INotification`.
+Create a new event class that inherits from `IntegrationEvent`.
 
 **Location:** `src/Shared/Common.IntegrationEvents/{ModuleName}/`
 
@@ -76,7 +75,6 @@ Create a new event class that inherits from `IntegrationEvent` and implements `I
 
 ```csharp
 using Common.Abstractions.Messaging;
-using MediatR;
 
 namespace Common.IntegrationEvents.YourModule;
 
@@ -85,12 +83,11 @@ public record YourEventCreated(
     Guid MessageId,
     Guid EntityId,
     Guid UserId,
-    string SomeProperty) : IntegrationEvent, INotification;
+    string SomeProperty) : IntegrationEvent;
 ```
 
 **Key Requirements:**
 - Inherit from `IntegrationEvent` base class
-- Implement `INotification` from MediatR
 - Use `[IntegrationEventRoutingKey]` attribute with your routing key constant
 - Define as a `record` for immutability
 - Include `MessageId` as first parameter (used for idempotency)
@@ -294,106 +291,113 @@ public async Task CreateOutboxMessageAsync(
 
 ## Step 7: Create OutboxPublisher Background Service
 
-If your module doesn't have one, create an `OutboxPublisher` background service.
+If your module doesn't have one, create an `OutboxPublisher` background service that publishes events directly to RabbitMQ.
 
 **Location:** `src/Modules/{YourModule}/{YourModule}.Infrastructure/BackgroundServices/OutboxPublisher.cs`
 
 ```csharp
 using System.Text.Json;
-using MediatR;
+using Common.Abstractions.Messaging;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using YourModule.Application.Abstractions;
 using YourModule.Domain.Entities;
+using YourModule.Infrastructure.DbContexts;
 
 namespace YourModule.Infrastructure.BackgroundServices;
 
 public class OutboxPublisher(
-    IServiceProvider serviceProvider,
+    IServiceScopeFactory scopeFactory,
+    IMessagePublisher messagePublisher,
     ILogger<OutboxPublisher> logger) : BackgroundService
 {
-    private const int BatchSize = 50;
-    private const int DelayMs = 5000;
-
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        logger.LogInformation("OutboxPublisher background service starting");
-
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                await ProcessOutboxMessagesAsync(stoppingToken);
+                await ProcessOutboxMessages(stoppingToken);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error processing outbox messages");
             }
 
-            await Task.Delay(DelayMs, stoppingToken);
+            await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
         }
     }
 
-    private async Task ProcessOutboxMessagesAsync(CancellationToken cancellationToken)
+    private async Task ProcessOutboxMessages(CancellationToken ct)
     {
-        using var scope = serviceProvider.CreateScope();
-        var repository = scope.ServiceProvider.GetRequiredService<IYourRepository>();
-        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+        using var scope = scopeFactory.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<YourModuleContext>();
 
-        var messages = await repository.GetUnpublishedOutboxMessagesAsync(
-            BatchSize,
-            cancellationToken);
+        var messages = await context.OutboxMessages
+            .Where(m => !m.Published)
+            .OrderBy(m => m.CreatedAt)
+            .Take(50)
+            .ToListAsync(ct);
 
         foreach (var message in messages)
         {
             try
             {
-                var eventType = Type.GetType(message.Type);
-                if (eventType == null)
-                {
-                    logger.LogError(
-                        "Could not resolve type {Type} for outbox message {MessageId}",
-                        message.Type,
-                        message.MessageId);
-                    continue;
-                }
+                var (@event, routingKey) = DeserializeEvent(message);
 
-                var @event = JsonSerializer.Deserialize(message.Payload, eventType);
-                if (@event == null)
-                {
-                    logger.LogError(
-                        "Could not deserialize payload for outbox message {MessageId}",
-                        message.MessageId);
-                    continue;
-                }
-
-                await mediator.Publish(@event, cancellationToken);
+                await messagePublisher.PublishAsync(@event, routingKey, ct);
 
                 message.Published = true;
                 message.PublishedAt = DateTimeOffset.UtcNow;
 
-                await unitOfWork.SaveChangesAsync(cancellationToken);
-
                 logger.LogInformation(
-                    "Published outbox message {MessageId} of type {EventType}",
+                    "Published {Type} with MessageId {MessageId} to RabbitMQ with routing key {RoutingKey}",
+                    message.Type,
                     message.MessageId,
-                    eventType.Name);
+                    routingKey);
             }
             catch (Exception ex)
             {
-                logger.LogError(
-                    ex,
-                    "Error publishing outbox message {MessageId}",
-                    message.MessageId);
+                logger.LogError(ex, "Failed to process outbox message {MessageId}", message.MessageId);
             }
         }
+
+        await context.SaveChangesAsync(ct);
+    }
+
+    private (object Event, string RoutingKey) DeserializeEvent(OutboxMessage message)
+    {
+        var eventType = Type.GetType(message.Type)
+                        ?? throw new InvalidOperationException($"Cannot resolve type: {message.Type}");
+
+        var @event = JsonSerializer.Deserialize(message.Payload, eventType)
+                     ?? throw new InvalidOperationException("Deserialization failed");
+
+        var routingKey = GetRoutingKey(eventType);
+
+        return (@event, routingKey);
+    }
+
+    private static string GetRoutingKey(Type eventType)
+    {
+        var attribute = eventType.GetCustomAttributes(typeof(IntegrationEventRoutingKeyAttribute), false)
+            .FirstOrDefault() as IntegrationEventRoutingKeyAttribute;
+
+        return attribute?.RoutingKey
+               ?? throw new InvalidOperationException(
+                   $"Integration event {eventType.Name} must have [IntegrationEventRoutingKey] attribute");
     }
 }
 ```
 
-**Add repository method:**
+**Key Features:**
+- **Direct RabbitMQ Publishing:** Uses `IMessagePublisher` to publish directly to RabbitMQ
+- **Attribute-Based Routing:** Dynamically extracts routing key from `[IntegrationEventRoutingKey]` attribute using reflection
+- **Generic Event Handling:** Supports any event type without switch statements or explicit type handling
+- **Performance:** Reflection overhead is negligible compared to network I/O (RabbitMQ publish is 100-1000x slower)
+
+**Note:** The OutboxPublisher shown above queries the `OutboxMessages` DbSet directly via the DbContext. If you prefer using repository pattern, add this method:
 
 ```csharp
 // Interface
@@ -708,7 +712,7 @@ Check DLQ in RabbitMQ Management UI and manually republish or investigate failur
 **Solution:** Ensure `AssemblyQualifiedName` is used when storing the Type in OutboxMessage.
 
 ### Issue: Messages stuck in outbox
-**Solution:** Check OutboxPublisher logs. Verify Mediator handler is registered.
+**Solution:** Check OutboxPublisher logs. Verify RabbitMQ connection is working and `IMessagePublisher` is registered.
 
 ### Issue: Consumer not receiving messages
 **Solution:**
@@ -731,6 +735,8 @@ Check DLQ in RabbitMQ Management UI and manually republish or investigate failur
 6. **Testing:** Write integration tests for publish/consume workflows
 7. **Transactions:** Always save entity and outbox message in same transaction
 8. **Error Handling:** Only throw exceptions in consumers when retry is appropriate
+9. **Reflection Performance:** Don't worry about reflection overhead in OutboxPublisher - it's negligible compared to network I/O
+10. **Routing Keys:** Use `[IntegrationEventRoutingKey]` attribute on all integration events for automatic routing
 
 ---
 
@@ -742,7 +748,6 @@ Check DLQ in RabbitMQ Management UI and manually republish or investigate failur
 - **Event handler interface:** `src/Shared/Common.Abstractions/Messaging/IIntegrationEventHandler.cs`
 - **Publisher interface:** `src/Shared/Common.Abstractions/Messaging/IMessagePublisher.cs`
 - **Consumer interface:** `src/Shared/Common.Abstractions/Messaging/IMessageConsumer.cs`
-- **Publish handler:** `src/Shared/Common.Infrastructure/Messaging/EventPublishHandler.cs`
 - **RabbitMQ publisher:** `src/Shared/Common.Infrastructure/Messaging/RabbitMqPublisher.cs`
 - **RabbitMQ consumer:** `src/Shared/Common.Infrastructure/Messaging/RabbitMqConsumer.cs`
 - **RabbitMQ options:** `src/Shared/Common.Infrastructure/Messaging/RabbitMqOptions.cs`
