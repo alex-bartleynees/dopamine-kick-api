@@ -9,6 +9,11 @@
   <ItemGroup>
     <PackageReference Include="AppAny.Quartz.EntityFrameworkCore.Migrations.PostgreSQL" Version="0.5.1" />
     <PackageReference Include="Ardalis.GuardClauses" Version="5.0.0" />
+    <PackageReference Include="Mediator.Abstractions" Version="3.1.0-preview.14" />
+    <PackageReference Include="Mediator.SourceGenerator" Version="3.1.0-preview.14">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
@@ -20,11 +25,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\Common.Abstractions\Common.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\Shared\Common.Infrastructure\Common.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Common.IntegrationEvents\Common.IntegrationEvents.csproj" />
-    <ProjectReference Include="..\Notifications.Application\Notifications.Application.csproj" />
-    <ProjectReference Include="..\Notifications.Domain\Notifications.Domain.csproj" />
+    <ProjectReference Include="..\Notifications.Infrastructure\Notifications.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

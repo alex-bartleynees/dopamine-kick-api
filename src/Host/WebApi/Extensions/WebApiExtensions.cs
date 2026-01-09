@@ -3,7 +3,7 @@ using Common.Abstractions.Messaging;
 using Common.Infrastructure.Messaging;
 using Habits.Api;
 using Microsoft.OpenApi;
-using Notifications.Infrastructure;
+using Notifications.Api;
 using SharpGrip.FluentValidation.AutoValidation.Endpoints.Extensions;
 using StackExchange.Redis;
 using Users.Api;

@@ -2,11 +2,12 @@ using System.Text.Json;
 using Ardalis.GuardClauses;
 using Common.IntegrationEvents.Habits;
 using Microsoft.Extensions.Logging;
+using Notifications.Application.Abstractions;
 using Quartz;
 
 namespace Notifications.Infrastructure.Jobs;
 
-public class HabitReminderJob(ILogger<HabitReminderJob> logger) : IJob
+public class HabitReminderJob(IWebPushService webPushService, ILogger<HabitReminderJob> logger) : IJob
 {
     public async Task Execute(IJobExecutionContext context)
     {
@@ -27,10 +28,14 @@ public class HabitReminderJob(ILogger<HabitReminderJob> logger) : IJob
                 return;
             }
 
-            logger.LogInformation($"{habit.HabitEmoji} Time to complete your '{habit.HabitName}' habit!");
-
-            // TODO Send web push notification
-            // await webPushService.SendNotification()
+            await webPushService.SendNotificationToUserAsync(
+                habit.UserId,
+                $"{habit.HabitEmoji} {habit.HabitName}",
+                $"Time to work on your '{habit.HabitName}' habit! Target: {habit.HabitTarget}",
+                habit.HabitEmoji,
+                new { type = "habit_reminder", habitId = habit.ReminderId, habitName = habit.HabitName },
+                CancellationToken.None
+            );
 
             logger.LogInformation("Successfully sent habit reminder for '{HabitName}' to user {UserId}",
                 habit.HabitName, userId);

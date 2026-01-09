@@ -10,6 +10,7 @@ namespace Notifications.Infrastructure.DbContexts;
 public class NotificationsContext(DbContextOptions<NotificationsContext> options) : DbContext(options), INotificationsUnitOfWork
 {
     public DbSet<ProcessedMessage> ProcessedMessages { get; set; }
+    public DbSet<WebPushSubscription> WebPushSubscriptions { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

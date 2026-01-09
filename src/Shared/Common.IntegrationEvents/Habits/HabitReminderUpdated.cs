@@ -8,4 +8,4 @@ public record HabitReminderUpdated(
     Guid MessageId,
     Guid ReminderId,
     TimeOnly NotificationTime,
-    string TimeZone) : IntegrationEvent, INotification;
+    string TimeZone) : IntegrationEvent;

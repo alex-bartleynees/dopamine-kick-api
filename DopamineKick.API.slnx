@@ -11,6 +11,7 @@
     <Project Path="src/Modules/Habits/Habits.Infrastructure/Habits.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/Modules/Notifications/">
+    <Project Path="src/Modules/Notifications/Notifications.Api/Notifications.Api.csproj" />
     <Project Path="src/Modules/Notifications/Notifications.Application/Notifications.Application.csproj" />
     <Project Path="src/Modules/Notifications/Notifications.Domain/Notifications.Domain.csproj" />
     <Project Path="src/Modules/Notifications/Notifications.Infrastructure/Notifications.Infrastructure.csproj" />

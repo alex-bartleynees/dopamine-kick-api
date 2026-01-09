@@ -1,5 +1,6 @@
 using Common.Abstractions.Messaging;
 using Common.Infrastructure.Interceptors;
+using Common.Infrastructure.Messaging;
 using Common.IntegrationEvents.Habits;
 using Habits.Application.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -9,11 +10,12 @@ using Notifications.Application.Abstractions;
 using Notifications.Application.Handlers;
 using Notifications.Infrastructure.BackgroundServices;
 using Notifications.Infrastructure.DbContexts;
+using Notifications.Infrastructure.Repositories;
 using Notifications.Infrastructure.Services;
 using Quartz;
 using Quartz.Impl.AdoJobStore;
 
-namespace Notifications.Infrastructure;
+namespace Notifications.Api;
 
 public static class NotificationsModule
 {
@@ -39,6 +41,7 @@ public static class NotificationsModule
                 .AddInterceptors(sp.GetRequiredService<AuditableEntityInterceptor>()));
 
         services.AddScoped<INotificationsUnitOfWork>(sp => sp.GetRequiredService<NotificationsContext>());
+        services.AddScoped<INotificationsRepository, NotificationsRepository>();
 
         services.AddQuartz(options =>
         {
@@ -69,9 +72,20 @@ public static class NotificationsModule
 
         services.AddScoped<IJobScheduler, JobSchedulerService>();
         services.AddScoped<IProcessedMessageService, ProcessedMessageService>();
+        services.AddScoped<IWebPushService, WebPushService>();
+        
+        services.AddMediator(options =>
+        {
+            options.Namespace = "Notifications.Api.Mediator";
+            options.ServiceLifetime = ServiceLifetime.Scoped;
+            options.GenerateTypesAsInternal = true;
+        });
 
         // Register background services
         services.AddHostedService<HabitReminderConsumerService>();
+        
+        services.Configure<RabbitMqOptions>(
+            configuration.GetSection(RabbitMqOptions.SectionName));
 
         return services;
     }
