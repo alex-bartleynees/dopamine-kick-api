@@ -1,5 +1,3 @@
-using Notifications.Domain.Entities;
-
 namespace Notifications.Application.Abstractions;
 
 public interface IWebPushService
