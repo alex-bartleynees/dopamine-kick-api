@@ -1,5 +1,6 @@
 using Common.Abstractions.Messaging;
 using Common.IntegrationEvents.Habits;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -7,7 +8,7 @@ namespace Notifications.Infrastructure.BackgroundServices;
 
 public class HabitReminderConsumerService(
     IMessageConsumer consumer,
-    IIntegrationEventHandler<HabitReminderCreated> handler,
+    IServiceScopeFactory serviceScopeFactory,
     ILogger<HabitReminderConsumerService> logger)
     : BackgroundService
 {
@@ -18,6 +19,11 @@ public class HabitReminderConsumerService(
         await consumer.Subscribe<HabitReminderCreated>(
             queueName: "notifications.habit-reminders",
             routingKey: MessagingConstants.HabitReminderCreatedKey,
-            handler: async @event => await handler.HandleAsync(@event, stoppingToken));
+            handler: async @event =>
+            {
+                using var scope = serviceScopeFactory.CreateScope();
+                var handler = scope.ServiceProvider.GetRequiredService<IIntegrationEventHandler<HabitReminderCreated>>();
+                await handler.HandleAsync(@event, stoppingToken);
+            });
     }
 }
