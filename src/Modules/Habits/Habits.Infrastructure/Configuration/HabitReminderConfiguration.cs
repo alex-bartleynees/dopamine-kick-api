@@ -43,7 +43,6 @@ public class HabitReminderConfiguration : IEntityTypeConfiguration<HabitReminder
 
         builder.HasIndex(hr => hr.UserId);
 
-        builder.HasIndex(hr => hr.HabitId)
-            .IsUnique();
+        builder.HasIndex(hr => hr.HabitId);
     }
 }
