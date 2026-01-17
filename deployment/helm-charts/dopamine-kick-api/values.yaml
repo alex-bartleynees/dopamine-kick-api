@@ -1,0 +1,148 @@
+replicaCount: 1
+
+namespace: "dopamine-kick"
+
+image:
+  repository: creativefree/dopamine-kick-api
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+
+service:
+  type: ClusterIP
+  port: 80
+
+# Resource limits and requests
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "200m"
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 45
+  periodSeconds: 10
+  timeoutSeconds: 10
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 20
+  periodSeconds: 5
+  timeoutSeconds: 10
+  failureThreshold: 3
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Configuration
+config:
+  aspNetCoreHttpPorts: "5009"
+  aspNetCoreUrls: "http://+:5009"
+  otlpEndpoint: "http://my-collector-collector.monitoring.svc.cluster.local:4317"
+  redisConnection: "redis-master.redis.svc.cluster.local:6379"
+
+# Database configuration
+database:
+  secretName: "dopamine-kick-db-secret"
+  userDbConnectionStringKey: "USER_DB_CONNECTION_STRING"
+  habitsDbConnectionStringKey: "HABITS_DB_CONNECTION_STRING"
+  notificationsDbConnectionStringKey: "NOTIFICATIONS_DB_CONNECTION_STRING"
+
+# Redis configuration
+redis:
+  useTls: "true"
+  host: "redis-master.redis.svc.cluster.local"
+  secretName: "redis-auth"
+  passwordKey: "REDIS_PASSWORD"
+
+# Keycloak configuration
+keycloak:
+  secretName: "keycloak-auth"
+  secretKeyName: "ADMIN_CLIENT_SECRET"
+
+# WebPush configuration
+webpush:
+  publicKey: "BOWDt3dg2PPYiW5gHdPBLC60cxO2DvXc-xHTxFn0SVU3qx6wy0bc7qKQ6R6yXGwhMpgL_hcR4i8lETdsuUESYJo"
+  subject: "mailto:alex@alexbartleynees.com"
+  secretName: "webpush-secret"
+  privateKeyKeyName: "PRIVATE_KEY"
+
+# RabbitMQ configuration
+rabbitmq:
+  hostName: "definition.rabbitmq-system.svc.cluster.local"
+  virtualHost: "/dopamine-kick"
+  secretName: "rabbitmq-secret"
+  usernameKey: "USERNAME"
+  passwordKey: "PASSWORD"
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: api.dopamine-kick.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+    # - secretName: dopamine-kick-api-tls
+    #   hosts:
+    #     - api.dopamine-kick.example.com

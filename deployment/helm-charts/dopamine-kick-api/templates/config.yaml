@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dopamine-kick-api-config
+  namespace: {{ include "dopamine-kick-api.namespace" . }}
+  labels:
+    {{- include "dopamine-kick-api.labels" . | nindent 4 }}
+data:
+  ASPNETCORE_HTTP_PORTS: {{ .Values.config.aspNetCoreHttpPorts | quote }}
+  ASPNETCORE_URLS: {{ .Values.config.aspNetCoreUrls | quote }}
+  ConnectionStrings__OTLP_Endpoint: {{ .Values.config.otlpEndpoint | quote }}
+  ConnectionStrings__RedisConnection: {{ .Values.config.redisConnection | quote }}
+  Redis__UseTls: {{ .Values.redis.useTls | quote }}
+  Redis__Host: {{ .Values.redis.host | quote }}
+  WebPush__PublicKey: {{ .Values.webpush.publicKey | quote }}
+  WebPush__Subject: {{ .Values.webpush.subject | quote }}
+  RabbitMQ__HostName: {{ .Values.rabbitmq.hostName | quote }}
+  RabbitMQ__VirtualHost: {{ .Values.rabbitmq.virtualHost | quote }}
