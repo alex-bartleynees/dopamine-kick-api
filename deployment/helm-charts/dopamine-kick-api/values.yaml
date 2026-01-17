@@ -112,8 +112,16 @@ redis:
 
 # Keycloak configuration
 keycloak:
+  baseUrl: "https://identity.alexbartleynees.com"
+  realm: "production"
+  clientId: "admin-cli"
   secretName: "keycloak-auth"
   secretKeyName: "ADMIN_CLIENT_SECRET"
+
+# JWT configuration
+jwt:
+  authority: "https://identity.alexbartleynees.com/realms/production"
+  audience: "account"
 
 # WebPush configuration
 webpush:

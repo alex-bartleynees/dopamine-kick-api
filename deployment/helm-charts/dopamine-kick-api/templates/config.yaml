@@ -16,3 +16,8 @@ data:
   WebPush__Subject: {{ .Values.webpush.subject | quote }}
   RabbitMQ__HostName: {{ .Values.rabbitmq.hostName | quote }}
   RabbitMQ__VirtualHost: {{ .Values.rabbitmq.virtualHost | quote }}
+  Keycloak__BaseUrl: {{ .Values.keycloak.baseUrl | quote }}
+  Keycloak__Realm: {{ .Values.keycloak.realm | quote }}
+  Keycloak__ClientId: {{ .Values.keycloak.clientId | quote }}
+  Jwt__Authority: {{ .Values.jwt.authority | quote }}
+  Jwt__Audience: {{ .Values.jwt.audience | quote }}
