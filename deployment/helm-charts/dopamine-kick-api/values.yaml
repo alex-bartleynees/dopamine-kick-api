@@ -5,7 +5,7 @@ namespace: "dopamine-kick"
 image:
   repository: creativefree/dopamine-kick-api
   pullPolicy: IfNotPresent
-  tag: 7ff874b
+  tag: 1e10eee
 
 imagePullSecrets: []
 nameOverride: ""
