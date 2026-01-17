@@ -16,8 +16,6 @@ public static class WebApiExtensions
 {
     public static void RegisterServices(this WebApplicationBuilder builder)
     {
-        var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
         // Add StackExchangeRedisCache service for Redis
         builder.Services.AddStackExchangeRedisCache(options =>
         {
@@ -62,16 +60,6 @@ public static class WebApiExtensions
 
         builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy(name: MyAllowSpecificOrigins,
-                policy =>
-                {
-                    policy.WithOrigins("http://localhost:3000")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod();
-                });
-        });
         builder.Services.AddProblemDetails();
         builder.Services.AddFluentValidationAutoValidation(configuration =>
         {
@@ -102,6 +90,8 @@ public static class WebApiExtensions
                 Description = "DopamineKick API documentation",
             });
         });
+
+        builder.Services.AddHealthChecks();
     }
 
     public static void RegisterAppConfig(this WebApplication app)
@@ -118,8 +108,7 @@ public static class WebApiExtensions
 
         app.UseHttpsRedirection();
 
-        var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-        app.UseCors(MyAllowSpecificOrigins);
+        app.MapHealthChecks("/health");
 
         app.RegisterEndpointDefinitions();
         app.UseMiddleware<ExceptionHandlingMiddleware>();
