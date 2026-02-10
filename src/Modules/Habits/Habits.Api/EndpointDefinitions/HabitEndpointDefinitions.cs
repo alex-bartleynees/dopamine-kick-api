@@ -31,7 +31,7 @@ public class HabitEndpointDefinitions : IEndpointDefinition
     }
 
     private async Task<Ok<List<Habit>>> GetMyHabits(
-        Habits.Api.Mediator.Mediator mediator,
+        Mediator.Mediator mediator,
         HttpContext context)
     {
         var userId = (Guid)context.Items[UserIdEndpointFilter.UserIdKey]!;
@@ -43,7 +43,7 @@ public class HabitEndpointDefinitions : IEndpointDefinition
     }
     
     private async Task<Results<Ok<Habit>, NotFound<Error>>> GetHabitById(
-        Habits.Api.Mediator.Mediator mediator,
+        Mediator.Mediator mediator,
         HttpContext context,
         Guid habitId)
     {
@@ -61,7 +61,7 @@ public class HabitEndpointDefinitions : IEndpointDefinition
     }
 
     private async Task<Results<Created<Habit>, BadRequest<Error>>> CreateHabit(
-        Habits.Api.Mediator.Mediator mediator,
+        Mediator.Mediator mediator,
         HttpContext context,
         HabitForCreationDto habit)
     {
@@ -79,7 +79,7 @@ public class HabitEndpointDefinitions : IEndpointDefinition
     }
 
     private async Task<Results<Created<List<Habit>>, BadRequest<Error>>> BulkCreateHabits(
-        Habits.Api.Mediator.Mediator mediator,
+        Mediator.Mediator mediator,
         HttpContext context,
         BulkHabitsForCreationDto request)
     {
@@ -97,7 +97,7 @@ public class HabitEndpointDefinitions : IEndpointDefinition
     }
 
     private async Task<Results<Created<HabitCompletion>, BadRequest<Error>>> MarkHabitCompleted(
-        Habits.Api.Mediator.Mediator mediator,
+        Mediator.Mediator mediator,
         HttpContext context,
         HabitForCompletionDto request)
     {
@@ -115,14 +115,14 @@ public class HabitEndpointDefinitions : IEndpointDefinition
     }
 
     private async Task<Results<Created<Guid>, BadRequest<Error>>> CreateHabitReminder(
-        Habits.Api.Mediator.Mediator mediator,
+        Mediator.Mediator mediator,
         HttpContext context,
         HabitReminderForCreationDto request)
     {
         var userId = (Guid)context.Items[UserIdEndpointFilter.UserIdKey]!;
 
         var command = new CreateHabitReminder(request.HabitId, userId, request.NotificationTime, request.Timezone,
-            request.PreferredTime, request.isEnabled);
+            request.PreferredTime, request.IsEnabled);
         var result = await mediator.Send(command);
 
         if (result.IsFailure)
@@ -134,7 +134,7 @@ public class HabitEndpointDefinitions : IEndpointDefinition
     }
 
     private async Task<Results<Created<List<Guid>>, BadRequest<Error>>> BulkCreateHabitReminders(
-        Habits.Api.Mediator.Mediator mediator,
+        Mediator.Mediator mediator,
         HttpContext context,
         BulkHabitRemindersForCreationDto request)
     {

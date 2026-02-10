@@ -7,14 +7,9 @@ namespace Habits.Application.Habits.Queries;
 
 public record GetMyHabits(Guid UserId) : IRequest<Result<List<Habit>>>;
 
-public class GetMyHabitsHandler : IRequestHandler<GetMyHabits, Result<List<Habit>>>
+public class GetMyHabitsHandler(IHabitsRepository habitsRepository) : IRequestHandler<GetMyHabits, Result<List<Habit>>>
 {
-    private readonly IHabitsRepository _habitsRepository;
-
-    public GetMyHabitsHandler(IHabitsRepository habitsRepository)
-    {
-        _habitsRepository = habitsRepository;
-    }
+    private readonly IHabitsRepository _habitsRepository = habitsRepository;
 
     public async ValueTask<Result<List<Habit>>> Handle(GetMyHabits request, CancellationToken cancellationToken)
     {

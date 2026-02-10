@@ -8,20 +8,14 @@ using Users.Infrastructure.Configuration;
 
 namespace Users.Infrastructure.Services;
 
-  public class KeycloakService : IKeycloakService
+  public class KeycloakService(HttpClient httpClient, IOptions<KeycloakSettings> settings) : IKeycloakService
     {
-        private readonly HttpClient _httpClient;
-        private readonly KeycloakSettings _settings;
+        private readonly HttpClient _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        private readonly KeycloakSettings _settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
         private string? _accessToken;
         private DateTime _tokenExpiry = DateTime.MinValue;
 
-        public KeycloakService(HttpClient httpClient, IOptions<KeycloakSettings> settings)
-        {
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            _settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
-        }
-
-        public async Task<Result<KeycloakUserResponse>> GetUserByEmailAsync(string email)
+    public async Task<Result<KeycloakUserResponse>> GetUserByEmailAsync(string email)
         {
             var tokenResult = await EnsureAccessTokenAsync();
             if (tokenResult.IsFailure)

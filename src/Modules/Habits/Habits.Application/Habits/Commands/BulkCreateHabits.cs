@@ -8,16 +8,10 @@ namespace Habits.Application.Habits.Commands;
 
 public record BulkCreateHabits(Guid UserId, List<HabitForCreationDto> Habits) : IRequest<Result<List<Habit>>>;
 
-public class BulkCreateHabitsHandler : IRequestHandler<BulkCreateHabits, Result<List<Habit>>>
+public class BulkCreateHabitsHandler(IHabitsRepository habitsRepository, IHabitsUnitOfWork unitOfWork) : IRequestHandler<BulkCreateHabits, Result<List<Habit>>>
 {
-    private readonly IHabitsRepository _habitsRepository;
-    private readonly IHabitsUnitOfWork _unitOfWork;
-
-    public BulkCreateHabitsHandler(IHabitsRepository habitsRepository, IHabitsUnitOfWork unitOfWork)
-    {
-        _habitsRepository = habitsRepository;
-        _unitOfWork = unitOfWork;
-    }
+    private readonly IHabitsRepository _habitsRepository = habitsRepository;
+    private readonly IHabitsUnitOfWork _unitOfWork = unitOfWork;
 
     public async ValueTask<Result<List<Habit>>> Handle(BulkCreateHabits request, CancellationToken cancellationToken)
     {

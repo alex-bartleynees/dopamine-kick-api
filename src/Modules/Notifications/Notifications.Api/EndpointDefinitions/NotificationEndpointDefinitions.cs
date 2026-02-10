@@ -27,7 +27,7 @@ public class NotificationEndpointDefinitions : IEndpointDefinition
     }
 
     private async Task<Results<NoContent, BadRequest<Error>>> SubscribeToPush(
-        Notifications.Api.Mediator.Mediator mediator, ClaimsPrincipal user, SubscribeToPushRequest request)
+        Mediator.Mediator mediator, ClaimsPrincipal user, SubscribeToPushRequest request)
     {
         var userId = user.GetUserId();
 
@@ -43,7 +43,7 @@ public class NotificationEndpointDefinitions : IEndpointDefinition
     }
 
     private async Task<Results<NoContent, BadRequest<Error>, NotFound<Error>>> UnsubscribeFromPush(
-        Guid id, Notifications.Api.Mediator.Mediator mediator, ClaimsPrincipal user)
+        Guid id, Mediator.Mediator mediator, ClaimsPrincipal user)
     {
         var userId = user.GetUserId();
 

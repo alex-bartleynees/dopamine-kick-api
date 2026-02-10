@@ -37,7 +37,7 @@ public class BulkCreateHabitRemindersHandler(IHabitsRepository habitsRepository,
             NotificationTime = dto.NotificationTime,
             TimeZone = dto.Timezone,
             PreferredTime = dto.PreferredTime,
-            IsEnabled = dto.isEnabled
+            IsEnabled = dto.IsEnabled
         }).ToList();
 
         var outboxMessages = reminders.Where(r => r.IsEnabled).Select(reminder =>

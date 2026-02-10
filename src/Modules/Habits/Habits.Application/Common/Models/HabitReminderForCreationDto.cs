@@ -5,4 +5,4 @@ public record HabitReminderForCreationDto(
     TimeOnly NotificationTime,
     string Timezone,
     string PreferredTime,
-    bool isEnabled);
+    bool IsEnabled);

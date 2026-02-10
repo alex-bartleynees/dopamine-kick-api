@@ -14,7 +14,7 @@ public class HabitReminderForCreationDtoValidator : AbstractValidator<HabitRemin
             .Must(BeAValidTimezone)
             .WithMessage("'{PropertyValue}' is not a valid IANA timezone identifier.");
         RuleFor(x => x.PreferredTime).NotEmpty();
-        RuleFor(x => x.isEnabled).NotNull();
+        RuleFor(x => x.IsEnabled).NotNull();
     } 
 
     private static bool BeAValidTimezone(string timezone)

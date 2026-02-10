@@ -7,7 +7,7 @@ public class BulkHabitsForCreationDtoValidator : AbstractValidator<BulkHabitsFor
 {
     public BulkHabitsForCreationDtoValidator(HabitForCreationDtoValidator habitValidator)
     {
-        RuleFor(x => x.Habits).Must(list => list.Count >= 3).WithMessage("Please provide at least 3 habits");
+        RuleFor(x => x.Habits).Must(list => list.Count >= 1).WithMessage("Please provide at least 1 habits");
         RuleForEach(x => x.Habits).SetValidator(habitValidator);
     }
 }

@@ -7,7 +7,7 @@ using Users.Domain.Entities;
 
 namespace Users.Application.Users.Queries;
 
-public record GetUserById(Guid userId) : IRequest<Result<User>>;
+public record GetUserById(Guid UserId) : IRequest<Result<User>>;
 
 public class GetUserByIdHandler : IRequestHandler<GetUserById, Result<User>>
 {
@@ -25,13 +25,13 @@ public class GetUserByIdHandler : IRequestHandler<GetUserById, Result<User>>
     {
         Guard.Against.Null(request);
 
-        var cacheKey = $"user:{request.userId}";
+        var cacheKey = $"user:{request.UserId}";
 
         var user = await _cache.GetOrCreateAsync<User?>(
             cacheKey,
             async ct =>
             {
-                var user = await _usersRepository.GetUser(request.userId, ct);
+                var user = await _usersRepository.GetUser(request.UserId, ct);
                 return user;
             },
             new HybridCacheEntryOptions
@@ -44,7 +44,7 @@ public class GetUserByIdHandler : IRequestHandler<GetUserById, Result<User>>
 
         if (user is null)
         {
-            return Result<User>.Failure(new Error(404, "Not Found", $"User with id: {request.userId} was not found"));
+            return Result<User>.Failure(new Error(404, "Not Found", $"User with id: {request.UserId} was not found"));
         }
 
         return Result<User>.Success(user);
