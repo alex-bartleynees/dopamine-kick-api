@@ -28,6 +28,7 @@
     <ProjectReference Include="..\..\Shared\Common.Abstractions\Common.Abstractions.csproj" />
     <ProjectReference Include="..\..\Modules\Users\Users.Api\Users.Api.csproj" />
     <ProjectReference Include="..\..\Modules\Habits\Habits.Api\Habits.Api.csproj" />
+    <ProjectReference Include="..\..\Modules\Quests\Quests.Api\Quests.Api.csproj" />
     <ProjectReference Include="..\..\Modules\Notifications\Notifications.Api\Notifications.Api.csproj" />
   </ItemGroup>
 

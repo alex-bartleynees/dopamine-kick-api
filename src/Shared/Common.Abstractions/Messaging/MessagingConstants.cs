@@ -10,7 +10,10 @@ public static class MessagingConstants
     // Routing Keys
     public const string HabitReminderCreatedKey = "habit.reminder.created";
     public const string HabitReminderUpdatedKey = "habit.reminder.updated";
+    public const string QuestReminderCreatedKey = "quest.reminder.created";
+    public const string QuestReminderCancelledKey = "quest.reminder.cancelled";
 
     // Queue Names
     public const string HabitRemindersQueue = "habit-reminders";
+    public const string QuestRemindersQueue = "quest-reminders";
 }

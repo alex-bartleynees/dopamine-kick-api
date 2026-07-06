@@ -2,6 +2,7 @@ using Common.Abstractions.Messaging;
 using Common.Infrastructure.Interceptors;
 using Common.Infrastructure.Messaging;
 using Common.IntegrationEvents.Habits;
+using Common.IntegrationEvents.Quests;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -68,6 +69,8 @@ public static class NotificationsModule
 
         // Register integration event handlers
         services.AddScoped<IIntegrationEventHandler<HabitReminderCreated>, HabitReminderCreatedHandler>();
+        services.AddScoped<IIntegrationEventHandler<QuestReminderCreated>, QuestReminderCreatedHandler>();
+        services.AddScoped<IIntegrationEventHandler<QuestReminderCancelled>, QuestReminderCancelledHandler>();
 
         services.AddScoped<IJobScheduler, JobSchedulerService>();
         services.AddScoped<IProcessedMessageService, ProcessedMessageService>();
@@ -84,6 +87,7 @@ public static class NotificationsModule
 
         // Register background services
         services.AddHostedService<HabitReminderConsumerService>();
+        services.AddHostedService<QuestReminderConsumerService>();
         
         services.Configure<RabbitMqOptions>(
             configuration.GetSection(RabbitMqOptions.SectionName));
