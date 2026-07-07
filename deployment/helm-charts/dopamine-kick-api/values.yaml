@@ -101,6 +101,7 @@ database:
   secretName: "dopamine-kick-db-secret"
   userDbConnectionStringKey: "USER_DB_CONNECTION_STRING"
   habitsDbConnectionStringKey: "HABITS_DB_CONNECTION_STRING"
+  questsDbConnectionStringKey: "QUESTS_DB_CONNECTION_STRING"
   notificationsDbConnectionStringKey: "NOTIFICATIONS_DB_CONNECTION_STRING"
 
 # Redis configuration

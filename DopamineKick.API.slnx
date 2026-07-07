@@ -10,6 +10,12 @@
     <Project Path="src/Modules/Habits/Habits.Domain/Habits.Domain.csproj" />
     <Project Path="src/Modules/Habits/Habits.Infrastructure/Habits.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/Modules/Quests/">
+    <Project Path="src/Modules/Quests/Quests.Api/Quests.Api.csproj" />
+    <Project Path="src/Modules/Quests/Quests.Application/Quests.Application.csproj" />
+    <Project Path="src/Modules/Quests/Quests.Domain/Quests.Domain.csproj" />
+    <Project Path="src/Modules/Quests/Quests.Infrastructure/Quests.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/src/Modules/Notifications/">
     <Project Path="src/Modules/Notifications/Notifications.Api/Notifications.Api.csproj" />
     <Project Path="src/Modules/Notifications/Notifications.Application/Notifications.Application.csproj" />

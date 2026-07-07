@@ -55,6 +55,11 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.database.secretName }}
                   key: {{ .Values.database.habitsDbConnectionStringKey }}
+            - name: ConnectionStrings__QuestsDBConnectionString
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.secretName }}
+                  key: {{ .Values.database.questsDbConnectionStringKey }}
             - name: ConnectionStrings__NotificationsDBConnectionString
               valueFrom:
                 secretKeyRef:

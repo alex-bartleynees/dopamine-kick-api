@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\Common.Abstractions\Common.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Common.Infrastructure\Common.Infrastructure.csproj" />
+    <ProjectReference Include="..\Quests.Infrastructure\Quests.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ardalis.GuardClauses" Version="5.0.0" />
+    <PackageReference Include="Mediator.Abstractions" Version="3.1.0-preview.14" />
+    <PackageReference Include="Mediator.SourceGenerator" Version="3.1.0-preview.14">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Endpoints" Version="1.5.0" />
+    <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Shared" Version="1.5.0" />
+  </ItemGroup>
+
+</Project>
