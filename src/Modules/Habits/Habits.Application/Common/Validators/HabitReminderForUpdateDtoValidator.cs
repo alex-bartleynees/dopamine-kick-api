@@ -3,9 +3,9 @@ using Habits.Application.Common.Models;
 
 namespace Habits.Application.Common.Validators;
 
-public class HabitReminderForCreationDtoValidator : AbstractValidator<HabitReminderForCreationDto>
+public class HabitReminderForUpdateDtoValidator : AbstractValidator<HabitReminderForUpdateDto>
 {
-    public HabitReminderForCreationDtoValidator()
+    public HabitReminderForUpdateDtoValidator()
     {
         RuleFor(x => x.NotificationTime).NotEmpty();
         RuleFor(x => x.TimeZone)

@@ -69,6 +69,7 @@ public static class NotificationsModule
 
         // Register integration event handlers
         services.AddScoped<IIntegrationEventHandler<HabitReminderCreated>, HabitReminderCreatedHandler>();
+        services.AddScoped<IIntegrationEventHandler<HabitReminderCancelled>, HabitReminderCancelledHandler>();
         services.AddScoped<IIntegrationEventHandler<QuestReminderCreated>, QuestReminderCreatedHandler>();
         services.AddScoped<IIntegrationEventHandler<QuestReminderCancelled>, QuestReminderCancelledHandler>();
 

@@ -25,5 +25,15 @@ public class HabitReminderConsumerService(
                 var handler = scope.ServiceProvider.GetRequiredService<IIntegrationEventHandler<HabitReminderCreated>>();
                 await handler.HandleAsync(@event, stoppingToken);
             });
+
+        await consumer.Subscribe<HabitReminderCancelled>(
+            queueName: "notifications.habit-reminders-cancelled",
+            routingKey: MessagingConstants.HabitReminderCancelledKey,
+            handler: async @event =>
+            {
+                using var scope = serviceScopeFactory.CreateScope();
+                var handler = scope.ServiceProvider.GetRequiredService<IIntegrationEventHandler<HabitReminderCancelled>>();
+                await handler.HandleAsync(@event, stoppingToken);
+            });
     }
 }

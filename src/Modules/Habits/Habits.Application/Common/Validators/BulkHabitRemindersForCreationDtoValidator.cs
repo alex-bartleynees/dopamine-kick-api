@@ -5,7 +5,7 @@ namespace Habits.Application.Common.Validators;
 
 public class BulkHabitRemindersForCreationDtoValidator : AbstractValidator<BulkHabitRemindersForCreationDto>
 {
-    public BulkHabitRemindersForCreationDtoValidator(HabitReminderForCreationDtoValidator reminderValidator)
+    public BulkHabitRemindersForCreationDtoValidator(BulkHabitReminderItemDtoValidator reminderValidator)
     {
         RuleFor(x => x.Reminders).NotEmpty().WithMessage("Please provide at least one reminder");
         RuleForEach(x => x.Reminders).SetValidator(reminderValidator);
