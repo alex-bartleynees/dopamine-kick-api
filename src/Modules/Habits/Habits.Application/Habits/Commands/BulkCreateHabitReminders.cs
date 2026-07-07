@@ -8,7 +8,7 @@ using Mediator;
 
 namespace Habits.Application.Habits.Commands;
 
-public record BulkCreateHabitReminders(Guid UserId, List<HabitReminderForCreationDto> Reminders) : IRequest<Result<List<Guid>>>;
+public record BulkCreateHabitReminders(Guid UserId, List<BulkHabitReminderItemDto> Reminders) : IRequest<Result<List<Guid>>>;
 
 public class BulkCreateHabitRemindersHandler(IHabitsRepository habitsRepository, IHabitsUnitOfWork unitOfWork)
     : IRequestHandler<BulkCreateHabitReminders, Result<List<Guid>>>
@@ -35,7 +35,7 @@ public class BulkCreateHabitRemindersHandler(IHabitsRepository habitsRepository,
             HabitId = dto.HabitId,
             UserId = request.UserId,
             NotificationTime = dto.NotificationTime,
-            TimeZone = dto.Timezone,
+            TimeZone = dto.TimeZone,
             PreferredTime = dto.PreferredTime,
             IsEnabled = dto.IsEnabled
         }).ToList();

@@ -1,6 +1,7 @@
 namespace Habits.Application.Common.Models;
 
-public record HabitReminderForCreationDto(
+public record BulkHabitReminderItemDto(
+    Guid HabitId,
     TimeOnly NotificationTime,
     string TimeZone,
     string PreferredTime,

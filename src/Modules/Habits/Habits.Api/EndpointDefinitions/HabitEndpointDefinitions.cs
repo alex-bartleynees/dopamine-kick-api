@@ -25,9 +25,14 @@ public class HabitEndpointDefinitions : IEndpointDefinition
         habits.MapGet("{habitId}", GetHabitById);
         habits.MapPost("", CreateHabit);
         habits.MapPost("bulk", BulkCreateHabits);
+        habits.MapPut("{habitId}", UpdateHabit);
+        habits.MapDelete("{habitId}", DeleteHabit);
         habits.MapPost("{habitId}/completions", MarkHabitCompleted);
+        habits.MapGet("{habitId}/reminders", GetHabitReminders);
         habits.MapPost("{habitId}/reminders", CreateHabitReminder);
         habits.MapPost("reminders/bulk", BulkCreateHabitReminders);
+        habits.MapPut("{habitId}/reminders/{reminderId}", UpdateHabitReminder);
+        habits.MapDelete("{habitId}/reminders/{reminderId}", DeleteHabitReminder);
     }
 
     private async Task<Ok<List<Habit>>> GetMyHabits(
@@ -114,23 +119,26 @@ public class HabitEndpointDefinitions : IEndpointDefinition
         return TypedResults.Created($"/api/habits/{request.HabitId}", result.ValueOrThrow);
     }
 
-    private async Task<Results<Created<Guid>, BadRequest<Error>>> CreateHabitReminder(
+    private async Task<Results<Created<Guid>, BadRequest<Error>, NotFound<Error>>> CreateHabitReminder(
         Mediator.Mediator mediator,
         HttpContext context,
+        Guid habitId,
         HabitReminderForCreationDto request)
     {
         var userId = (Guid)context.Items[UserIdEndpointFilter.UserIdKey]!;
 
-        var command = new CreateHabitReminder(request.HabitId, userId, request.NotificationTime, request.Timezone,
+        var command = new CreateHabitReminder(habitId, userId, request.NotificationTime, request.TimeZone,
             request.PreferredTime, request.IsEnabled);
         var result = await mediator.Send(command);
 
         if (result.IsFailure)
         {
-            return TypedResults.BadRequest(result.Error);
+            return result.Error.Status == 404
+                ? TypedResults.NotFound(result.Error)
+                : TypedResults.BadRequest(result.Error);
         }
 
-        return TypedResults.Created($"/api/habits/{request.HabitId}", result.ValueOrThrow);
+        return TypedResults.Created($"/api/habits/{habitId}/reminders/{result.ValueOrThrow}", result.ValueOrThrow);
     }
 
     private async Task<Results<Created<List<Guid>>, BadRequest<Error>>> BulkCreateHabitReminders(
@@ -149,5 +157,98 @@ public class HabitEndpointDefinitions : IEndpointDefinition
         }
 
         return TypedResults.Created("/api/habits/reminders", result.ValueOrThrow);
+    }
+
+    private async Task<Results<Ok<Habit>, BadRequest<Error>, NotFound<Error>>> UpdateHabit(
+        Mediator.Mediator mediator,
+        HttpContext context,
+        Guid habitId,
+        HabitForUpdateDto habit)
+    {
+        var userId = (Guid)context.Items[UserIdEndpointFilter.UserIdKey]!;
+
+        var command = new UpdateHabit(userId, habitId, habit);
+        var result = await mediator.Send(command);
+
+        if (result.IsFailure)
+        {
+            return result.Error.Status == 404
+                ? TypedResults.NotFound(result.Error)
+                : TypedResults.BadRequest(result.Error);
+        }
+
+        return TypedResults.Ok(result.ValueOrThrow);
+    }
+
+    private async Task<Results<NoContent, NotFound<Error>>> DeleteHabit(
+        Mediator.Mediator mediator,
+        HttpContext context,
+        Guid habitId)
+    {
+        var userId = (Guid)context.Items[UserIdEndpointFilter.UserIdKey]!;
+
+        var command = new DeleteHabit(userId, habitId);
+        var result = await mediator.Send(command);
+
+        if (result.IsFailure)
+        {
+            return TypedResults.NotFound(result.Error);
+        }
+
+        return TypedResults.NoContent();
+    }
+
+    private async Task<Ok<List<HabitReminder>>> GetHabitReminders(
+        Mediator.Mediator mediator,
+        HttpContext context,
+        Guid habitId)
+    {
+        var userId = (Guid)context.Items[UserIdEndpointFilter.UserIdKey]!;
+
+        var query = new GetHabitReminders(userId, habitId);
+        var result = await mediator.Send(query);
+
+        return TypedResults.Ok(result.ValueOrThrow);
+    }
+
+    private async Task<Results<Ok<Guid>, BadRequest<Error>, NotFound<Error>>> UpdateHabitReminder(
+        Mediator.Mediator mediator,
+        HttpContext context,
+        Guid habitId,
+        Guid reminderId,
+        HabitReminderForUpdateDto request)
+    {
+        var userId = (Guid)context.Items[UserIdEndpointFilter.UserIdKey]!;
+
+        var command = new UpdateHabitReminder(userId, reminderId, request);
+        var result = await mediator.Send(command);
+
+        if (result.IsFailure)
+        {
+            return result.Error.Status == 404
+                ? TypedResults.NotFound(result.Error)
+                : TypedResults.BadRequest(result.Error);
+        }
+
+        return TypedResults.Ok(result.ValueOrThrow);
+    }
+
+    private async Task<Results<NoContent, NotFound<Error>>> DeleteHabitReminder(
+        Mediator.Mediator mediator,
+        HttpContext context,
+        Guid habitId,
+        Guid reminderId)
+    {
+        var userId = (Guid)context.Items[UserIdEndpointFilter.UserIdKey]!;
+
+        var command = new DeleteHabitReminder(userId, reminderId);
+        var result = await mediator.Send(command);
+
+        if (result.IsFailure)
+        {
+            return TypedResults.NotFound(result.Error);
+        }
+
+        return TypedResults.NoContent();
     }
 }

@@ -32,6 +32,11 @@ public class HabitsRepository(HabitsContext context) : IHabitsRepository
             .FirstOrDefaultAsync(ct);
     }
 
+    public void Remove(Habit habit)
+    {
+        context.Habits.Remove(habit);
+    }
+
     public async Task CreateHabitCompletionAsync(HabitCompletion habitCompletion, CancellationToken ct = default)
     {
         await context.HabitCompletions.AddAsync(habitCompletion, ct);
@@ -45,6 +50,26 @@ public class HabitsRepository(HabitsContext context) : IHabitsRepository
     public async Task CreateBulkRemindersAsync(List<HabitReminder> reminders, CancellationToken ct = default)
     {
         await context.HabitReminders.AddRangeAsync(reminders, ct);
+    }
+
+    public async Task<HabitReminder?> GetReminderByIdAsync(Guid userId, Guid reminderId, CancellationToken ct = default)
+    {
+        return await context.HabitReminders
+            .Where(r => r.UserId == userId && r.Id == reminderId)
+            .FirstOrDefaultAsync(ct);
+    }
+
+    public async Task<List<HabitReminder>> GetRemindersByHabitAsync(Guid userId, Guid habitId, CancellationToken ct = default)
+    {
+        return await context.HabitReminders
+            .AsNoTracking()
+            .Where(r => r.UserId == userId && r.HabitId == habitId)
+            .ToListAsync(ct);
+    }
+
+    public void RemoveReminder(HabitReminder reminder)
+    {
+        context.HabitReminders.Remove(reminder);
     }
 
     public async Task CreateOutboxMessageAsync(OutboxMessage message, CancellationToken ct = default)

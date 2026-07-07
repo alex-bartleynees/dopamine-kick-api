@@ -38,12 +38,14 @@ public static class HabitsModule
     services.AddScoped<IHabitsUnitOfWork>(sp => sp.GetRequiredService<HabitsContext>());
 
     services.AddScoped<IValidator<HabitForCreationDto>, HabitForCreationDtoValidator>();
+    services.AddScoped<IValidator<HabitForUpdateDto>, HabitForUpdateDtoValidator>();
     services.AddScoped<IValidator<BulkHabitsForCreationDto>, BulkHabitsForCreationDtoValidator>();
     services.AddScoped<IValidator<HabitForCompletionDto>, HabitForCompletionDtoValidator>();
     services.AddScoped<IValidator<HabitReminderForCreationDto>, HabitReminderForCreationDtoValidator>();
+    services.AddScoped<IValidator<HabitReminderForUpdateDto>, HabitReminderForUpdateDtoValidator>();
     services.AddScoped<IValidator<BulkHabitRemindersForCreationDto>, BulkHabitRemindersForCreationDtoValidator>();
     services.AddScoped<HabitForCreationDtoValidator>();
-    services.AddScoped<HabitReminderForCreationDtoValidator>();
+    services.AddScoped<BulkHabitReminderItemDtoValidator>();
 
     services.AddMediator(options =>
     {

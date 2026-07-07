@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Common.Abstractions;
 
 namespace Quests.Domain.Entities;
@@ -19,5 +20,6 @@ public class QuestReminder : IAuditable
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
 
+    [JsonIgnore]
     public Quest Quest { get; set; } = null!;
 }

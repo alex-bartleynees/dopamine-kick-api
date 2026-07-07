@@ -16,8 +16,7 @@ public class JobSchedulerService(
     {
         var scheduler = await schedulerFactory.GetScheduler();
 
-        var jobKey = new JobKey($"habit-reminder-{message.ReminderId}-user-{message.UserId}");
-        var triggerKey = new TriggerKey($"habit-trigger-{message.ReminderId}-user-{message.UserId}");
+        var (jobKey, triggerKey) = HabitReminderKeys(message.ReminderId, message.UserId);
 
         // Delete existing job if it exists (handles updates to reminder times)
         if (await scheduler.CheckExists(jobKey))
@@ -48,6 +47,23 @@ public class JobSchedulerService(
         logger.LogInformation(
             "Scheduled habit reminder job {JobKey} for daily execution at {NotificationTime} ({TimeZone})",
             jobKey, message.NotificationTime, message.TimeZone);
+    }
+
+    public async Task CancelHabitReminderAsync(Guid reminderId, Guid userId)
+    {
+        var scheduler = await schedulerFactory.GetScheduler();
+
+        var (jobKey, _) = HabitReminderKeys(reminderId, userId);
+
+        if (await scheduler.CheckExists(jobKey))
+        {
+            await scheduler.DeleteJob(jobKey);
+            logger.LogInformation("Cancelled habit reminder job {JobKey}", jobKey);
+        }
+        else
+        {
+            logger.LogInformation("Habit reminder job {JobKey} not found, nothing to cancel", jobKey);
+        }
     }
 
     public async Task ScheduleQuestReminderAsync(QuestReminderCreated message)
@@ -100,6 +116,13 @@ public class JobSchedulerService(
         {
             logger.LogInformation("Quest reminder job {JobKey} not found, nothing to cancel", jobKey);
         }
+    }
+
+    private static (JobKey JobKey, TriggerKey TriggerKey) HabitReminderKeys(Guid reminderId, Guid userId)
+    {
+        var jobKey = new JobKey($"habit-reminder-{reminderId}-user-{userId}");
+        var triggerKey = new TriggerKey($"habit-trigger-{reminderId}-user-{userId}");
+        return (jobKey, triggerKey);
     }
 
     private static (JobKey JobKey, TriggerKey TriggerKey) QuestReminderKeys(Guid reminderId, Guid userId)

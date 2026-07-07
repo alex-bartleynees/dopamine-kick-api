@@ -3,10 +3,11 @@ using Habits.Application.Common.Models;
 
 namespace Habits.Application.Common.Validators;
 
-public class HabitReminderForCreationDtoValidator : AbstractValidator<HabitReminderForCreationDto>
+public class BulkHabitReminderItemDtoValidator : AbstractValidator<BulkHabitReminderItemDto>
 {
-    public HabitReminderForCreationDtoValidator()
+    public BulkHabitReminderItemDtoValidator()
     {
+        RuleFor(x => x.HabitId).NotEmpty();
         RuleFor(x => x.NotificationTime).NotEmpty();
         RuleFor(x => x.TimeZone)
             .NotEmpty()
