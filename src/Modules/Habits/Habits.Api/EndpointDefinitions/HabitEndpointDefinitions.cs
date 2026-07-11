@@ -28,6 +28,8 @@ public class HabitEndpointDefinitions : IEndpointDefinition
         habits.MapPut("{habitId}", UpdateHabit);
         habits.MapDelete("{habitId}", DeleteHabit);
         habits.MapPost("{habitId}/completions", MarkHabitCompleted);
+        habits.MapGet("completions", GetMyHabitCompletions);
+        habits.MapGet("{habitId}/completions", GetHabitCompletions);
         habits.MapGet("{habitId}/reminders", GetHabitReminders);
         habits.MapPost("{habitId}/reminders", CreateHabitReminder);
         habits.MapPost("reminders/bulk", BulkCreateHabitReminders);
@@ -250,5 +252,46 @@ public class HabitEndpointDefinitions : IEndpointDefinition
         }
 
         return TypedResults.NoContent();
+    }
+
+    private async Task<Results<Ok<AllHabitCompletionHistoryDto>, BadRequest<Error>>> GetMyHabitCompletions(
+        Mediator.Mediator mediator,
+        HttpContext context,
+        string timezone,
+        int days = 30)
+    {
+        var userId = (Guid)context.Items[UserIdEndpointFilter.UserIdKey]!;
+
+        var query = new GetMyHabitCompletions(userId, days, timezone);
+        var result = await mediator.Send(query);
+
+        if (result.IsFailure)
+        {
+            return TypedResults.BadRequest(result.Error);
+        }
+
+        return TypedResults.Ok(result.ValueOrThrow);
+    }
+
+    private async Task<Results<Ok<HabitCompletionHistoryDto>, BadRequest<Error>, NotFound<Error>>> GetHabitCompletions(
+        Mediator.Mediator mediator,
+        HttpContext context,
+        Guid habitId,
+        string timezone,
+        int days = 30)
+    {
+        var userId = (Guid)context.Items[UserIdEndpointFilter.UserIdKey]!;
+
+        var query = new GetHabitCompletions(userId, habitId, days, timezone);
+        var result = await mediator.Send(query);
+
+        if (result.IsFailure)
+        {
+            return result.Error.Status == 404
+                ? TypedResults.NotFound(result.Error)
+                : TypedResults.BadRequest(result.Error);
+        }
+
+        return TypedResults.Ok(result.ValueOrThrow);
     }
 }

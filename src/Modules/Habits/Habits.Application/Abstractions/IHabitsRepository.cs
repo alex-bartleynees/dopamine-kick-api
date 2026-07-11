@@ -17,4 +17,6 @@ public interface IHabitsRepository
     void RemoveReminder(HabitReminder reminder);
     Task CreateOutboxMessageAsync(OutboxMessage message, CancellationToken ct = default);
     Task CreateBulkOutboxMessagesAsync(List<OutboxMessage> messages, CancellationToken ct = default);
+    Task<Dictionary<Guid, List<DateOnly>>> GetCompletionDatesByUserAsync(Guid userId, DateOnly from, DateOnly to, CancellationToken ct = default);
+    Task<List<DateOnly>> GetCompletionDatesByHabitAsync(Guid habitId, DateOnly from, DateOnly to, CancellationToken ct = default);
 }

@@ -81,4 +81,35 @@ public class HabitsRepository(HabitsContext context) : IHabitsRepository
     {
         await context.OutboxMessages.AddRangeAsync(messages, ct);
     }
+
+    public async Task<Dictionary<Guid, List<DateOnly>>> GetCompletionDatesByUserAsync(Guid userId, DateOnly from,
+        DateOnly to, CancellationToken ct = default)
+    {
+        var habits = await context.Habits
+            .AsNoTracking()
+            .Where(h => h.UserId == userId)
+            .Select(h => new
+            {
+                h.Id,
+                Dates = context.HabitCompletions
+                    .Where(c => c.HabitId == h.Id && c.CompletedDate >= from && c.CompletedDate <= to)
+                    .OrderBy(c => c.CompletedDate)
+                    .Select(c => c.CompletedDate)
+                    .ToList()
+            })
+            .ToListAsync(ct);
+
+        return habits.ToDictionary(h => h.Id, h => h.Dates);
+    }
+
+    public async Task<List<DateOnly>> GetCompletionDatesByHabitAsync(Guid habitId, DateOnly from, DateOnly to,
+        CancellationToken ct = default)
+    {
+        return await context.HabitCompletions
+            .AsNoTracking()
+            .Where(c => c.HabitId == habitId && c.CompletedDate >= from && c.CompletedDate <= to)
+            .OrderBy(c => c.CompletedDate)
+            .Select(c => c.CompletedDate)
+            .ToListAsync(ct);
+    }
 }
