@@ -4,6 +4,7 @@ using Common.IntegrationEvents.Quests;
 using Mediator;
 using Quests.Application.Abstractions;
 using Quests.Domain.Entities;
+using Quests.Domain.Errors;
 
 namespace Quests.Application.Quests.Commands;
 
@@ -22,14 +23,12 @@ public class CreateQuestReminderHandler(IQuestsRepository questsRepository, IQue
         var quest = await questsRepository.GetQuestByIdAsync(command.UserId, command.QuestId, cancellationToken);
         if (quest is null)
         {
-            return Result<QuestReminder>.Failure(
-                new Error(404, "Not Found", $"Quest with id {command.QuestId} was not found"));
+            return Result<QuestReminder>.Failure(QuestErrors.NotFound(command.QuestId));
         }
 
         if (quest.Status == QuestStatus.Completed)
         {
-            return Result<QuestReminder>.Failure(
-                new Error(400, "BadRequest", "Cannot add a reminder to a completed quest"));
+            return Result<QuestReminder>.Failure(QuestReminderErrors.QuestCompleted());
         }
 
         var reminder = new QuestReminder

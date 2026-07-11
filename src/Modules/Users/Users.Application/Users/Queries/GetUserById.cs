@@ -4,6 +4,7 @@ using Mediator;
 using Microsoft.Extensions.Caching.Hybrid;
 using Users.Application.Abstractions;
 using Users.Domain.Entities;
+using Users.Domain.Errors;
 
 namespace Users.Application.Users.Queries;
 
@@ -44,7 +45,7 @@ public class GetUserByIdHandler : IRequestHandler<GetUserById, Result<User>>
 
         if (user is null)
         {
-            return Result<User>.Failure(new Error(404, "Not Found", $"User with id: {request.UserId} was not found"));
+            return Result<User>.Failure(UserErrors.NotFound(request.UserId));
         }
 
         return Result<User>.Success(user);

@@ -15,7 +15,7 @@ public class UserIdEndpointFilter : IEndpointFilter
 
         if (userId is null)
         {
-            return TypedResults.BadRequest(new Error(400, "BadRequest", "User ID not found in claims"));
+            return TypedResults.BadRequest(Error.Validation("Auth.MissingUserId", "User ID not found in claims"));
         }
 
         context.HttpContext.Items[UserIdKey] = userId.Value;

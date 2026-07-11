@@ -39,7 +39,7 @@ public class UserEndpointDefinitions : IEndpointDefinition
 
       if (result.IsFailure)
       {
-         if (result.Error.Status == 409)
+         if (result.Error.Type == ErrorType.Conflict)
          {
             return TypedResults.Conflict(result.Error);
          }

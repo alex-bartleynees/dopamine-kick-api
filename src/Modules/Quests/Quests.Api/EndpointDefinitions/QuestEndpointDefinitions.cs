@@ -92,7 +92,7 @@ public class QuestEndpointDefinitions : IEndpointDefinition
 
         if (result.IsFailure)
         {
-            return result.Error.Status == 404
+            return result.Error.Type == ErrorType.NotFound
                 ? TypedResults.NotFound(result.Error)
                 : TypedResults.BadRequest(result.Error);
         }
@@ -149,7 +149,7 @@ public class QuestEndpointDefinitions : IEndpointDefinition
 
         if (result.IsFailure)
         {
-            return result.Error.Status == 404
+            return result.Error.Type == ErrorType.NotFound
                 ? TypedResults.NotFound(result.Error)
                 : TypedResults.BadRequest(result.Error);
         }

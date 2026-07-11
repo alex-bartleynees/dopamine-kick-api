@@ -1,6 +1,7 @@
 using Common.Abstractions.Results;
 using Mediator;
 using Notifications.Application.Abstractions;
+using Notifications.Domain.Errors;
 
 namespace Notifications.Application.WebPush;
 
@@ -19,7 +20,7 @@ public class UnsubscribeFromPushCommandHandler(
 
         if (subscription is null)
         {
-            return Result.Failure(new Error(404, "Not Found", "Subscription not found"));
+            return Result.Failure(PushSubscriptionErrors.NotFound());
         }
 
         repository.Delete(subscription);

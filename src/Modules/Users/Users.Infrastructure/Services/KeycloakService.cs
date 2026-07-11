@@ -4,7 +4,9 @@ using Common.Abstractions.Results;
 using Microsoft.Extensions.Options;
 using Users.Application.Abstractions;
 using Users.Application.Common.Models;
+using Users.Domain.Errors;
 using Users.Infrastructure.Configuration;
+using Users.Infrastructure.Errors;
 
 namespace Users.Infrastructure.Services;
 
@@ -33,16 +35,14 @@ namespace Users.Infrastructure.Services;
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                return Result<KeycloakUserResponse>.Failure(
-                    new Error((int)response.StatusCode, "Keycloak Error", $"Failed to search users: {errorContent}"));
+                return Result<KeycloakUserResponse>.Failure(KeycloakErrors.SearchFailed(errorContent));
             }
 
             var users = await response.Content.ReadFromJsonAsync<List<KeycloakUser>>();
 
             if (users == null || users.Count == 0)
             {
-                return Result<KeycloakUserResponse>.Failure(
-                    new Error(404, "Not Found", $"User with email {email} not found in Keycloak"));
+                return Result<KeycloakUserResponse>.Failure(UserErrors.NotFoundByEmail(email));
             }
 
             var user = users[0];
@@ -91,8 +91,7 @@ namespace Users.Infrastructure.Services;
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                return Result<KeycloakUserResponse>.Failure(
-                    new Error((int)response.StatusCode, "Keycloak Error", $"Failed to create user: {errorContent}"));
+                return Result<KeycloakUserResponse>.Failure(KeycloakErrors.CreateFailed(errorContent));
             }
 
             // Keycloak returns 201 with Location header containing the user ID
@@ -124,16 +123,14 @@ namespace Users.Infrastructure.Services;
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                return Result<bool>.Failure(
-                    new Error((int)response.StatusCode, "Authentication Error", $"Failed to get Keycloak token: {errorContent}"));
+                return Result<bool>.Failure(KeycloakErrors.TokenRequestFailed(errorContent));
             }
 
             var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>();
 
             if (tokenResponse == null)
             {
-                return Result<bool>.Failure(
-                    new Error(500, "Token Error", "Failed to parse token response"));
+                return Result<bool>.Failure(KeycloakErrors.TokenParseFailed());
             }
 
             _accessToken = tokenResponse.AccessToken;

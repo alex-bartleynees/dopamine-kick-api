@@ -4,6 +4,7 @@ using Common.IntegrationEvents.Habits;
 using Habits.Application.Abstractions;
 using Habits.Application.Common.Models;
 using Habits.Domain.Entities;
+using Habits.Domain.Errors;
 using Mediator;
 
 namespace Habits.Application.Habits.Commands;
@@ -22,11 +23,7 @@ public class BulkCreateHabitRemindersHandler(IHabitsRepository habitsRepository,
 
         if (invalidHabitIds.Count != 0)
         {
-            return Result<List<Guid>>.Failure(
-                new Error(
-                    400,
-                    "Invalid Habit IDs",
-                    $"The following habit IDs do not exist: {string.Join(", ", invalidHabitIds)}"));
+            return Result<List<Guid>>.Failure(HabitErrors.InvalidHabitIds(invalidHabitIds));
         }
 
         var reminders = request.Reminders.Select(dto => new HabitReminder
