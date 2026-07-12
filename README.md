@@ -23,15 +23,23 @@ src/
 │   │   ├── Habits.Application/
 │   │   ├── Habits.Domain/
 │   │   └── Habits.Infrastructure/
+│   ├── Quests/                     # Quest tracking module
+│   │   ├── Quests.Api/
+│   │   ├── Quests.Application/
+│   │   ├── Quests.Domain/
+│   │   └── Quests.Infrastructure/
 │   └── Notifications/             # Notification system module
 │       ├── Notifications.Api/
 │       ├── Notifications.Application/
 │       ├── Notifications.Domain/
 │       └── Notifications.Infrastructure/
 └── Shared/
-    ├── Common.Abstractions/       # Shared interfaces and contracts
+    ├── Common.Abstractions/       # Shared interfaces, contracts, and the Result/Error types
     ├── Common.Infrastructure/     # Shared infrastructure code
     └── Common.IntegrationEvents/  # Integration event definitions
+
+tests/
+└── WebApi.IntegrationTests/       # End-to-end tests over real infrastructure (Testcontainers)
 ```
 
 ### Architectural Principles
@@ -97,6 +105,8 @@ Update `src/Host/WebApi/appsettings.json` with your configuration:
   "ConnectionStrings": {
     "UsersDBConnectionString": "Host=localhost;Database=UsersDB;Username=myuser;Password=mypassword;",
     "HabitsDBConnectionString": "Host=localhost;Database=HabitsDB;Username=myuser;Password=mypassword;",
+    "QuestsDBConnectionString": "Host=localhost;Database=QuestsDB;Username=myuser;Password=mypassword;",
+    "NotificationsDBConnectionString": "Host=localhost;Database=NotificationsDB;Username=myuser;Password=mypassword;",
     "RedisConnection": "localhost:6379"
   },
   "RabbitMQ": {
@@ -158,15 +168,33 @@ Handles user management, authentication, and user-related operations.
 Manages habit tracking, completions, and reminders.
 
 **Responsibilities:**
-- Create and manage habits
-- Track habit completions
-- Schedule habit reminders
+- Create and manage habits (including bulk creation)
+- Track habit completions and streaks
+- Query habit completion history (per-habit and across all habits)
+- Schedule and manage habit reminders (create, update, delete, bulk create)
 - Publish integration events when habits require notifications
 
 **Database:** HabitsDB
 
 **Background Services:**
 - Outbox publisher for reliable event publishing
+
+### Quests Module
+
+Manages quests — goal-oriented tasks with their own completion and reminder lifecycle.
+
+**Responsibilities:**
+- Create, update, and delete quests
+- Complete quests and track their status
+- Schedule quest reminders
+- Publish integration events when quests require notifications
+
+**Database:** QuestsDB
+
+**Background Services:**
+- Outbox publisher for reliable event publishing
+
+See the [Quests API Contract](docs/QUESTS_API_CONTRACT.md) for endpoint details.
 
 ### Notifications Module
 
@@ -211,6 +239,25 @@ All endpoints (except health checks) require a valid JWT token from Keycloak. In
 Authorization: Bearer <your-jwt-token>
 ```
 
+## Error Handling
+
+The application uses a structured, transport-agnostic error model based on the `Result` and `Error`
+types in `Common.Abstractions`. The application and domain layers describe **what kind** of failure
+occurred using a semantic `ErrorType` — they never hand-write HTTP status codes. The API layer derives
+the HTTP status and title from that type at the boundary.
+
+| `ErrorType`    | HTTP Status | Title       |
+|----------------|-------------|-------------|
+| `Validation`   | 400         | Bad Request |
+| `Unauthorized` | 401         | Unauthorized|
+| `NotFound`     | 404         | Not Found   |
+| `Conflict`     | 409         | Conflict    |
+| `Gone`         | 410         | Gone        |
+| `Failure`      | 500         | Server Error|
+
+Each `Error` carries a machine-readable `Code`, a human-readable `Detail`, and its semantic `Type`,
+and is serialized to clients as a problem-details response body.
+
 ## Development
 
 ### Project Guidelines
@@ -254,9 +301,34 @@ Authorization: Bearer <your-jwt-token>
 
 ### Running Tests
 
+The `tests/WebApi.IntegrationTests` project contains end-to-end integration tests. Each test boots the
+**real** WebApi host with `WebApplicationFactory<Program>` and drives it over HTTP against **real
+infrastructure** — Postgres, RabbitMQ, and Redis — spun up in Docker via
+[Testcontainers](https://dotnet.testcontainers.org/). Only the external Keycloak identity server is
+faked. This exercises the full stack: endpoint → validation → Mediator handler → EF Core → Postgres,
+plus the asynchronous outbox → RabbitMQ publishing loop.
+
+Docker must be running. Testcontainers pulls the images on first run and removes them afterwards.
+
 ```bash
-dotnet test
+# run all integration tests
+dotnet test tests/WebApi.IntegrationTests
+
+# run a single test class
+dotnet test tests/WebApi.IntegrationTests --filter "FullyQualifiedName~HabitsEndpointsTests"
 ```
+
+See [`tests/WebApi.IntegrationTests/README.md`](tests/WebApi.IntegrationTests/README.md) for details on
+the harness, authentication, and how to write new tests.
+
+## Continuous Integration & Deployment
+
+GitHub Actions workflows live in `.github/workflows`:
+
+- **CI (`ci.yml`)** — runs on pull requests to `main`. Restores and runs the integration test suite
+  (Testcontainers uses the Docker daemon on `ubuntu-latest`) and uploads the test results.
+- **CD (`cd.yml`)** — runs on pushes to `main`. Runs the integration tests, then builds the Docker
+  image and deploys with Helm.
 
 ## Configuration
 
@@ -294,6 +366,8 @@ Run the container:
 docker run -p 8080:8080 \
   -e ConnectionStrings__UsersDBConnectionString="your-connection-string" \
   -e ConnectionStrings__HabitsDBConnectionString="your-connection-string" \
+  -e ConnectionStrings__QuestsDBConnectionString="your-connection-string" \
+  -e ConnectionStrings__NotificationsDBConnectionString="your-connection-string" \
   dopaminekick-api
 ```
 
