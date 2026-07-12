@@ -4,6 +4,7 @@ using Mediator;
 using Users.Application.Abstractions;
 using Users.Application.Common.Models;
 using Users.Domain.Entities;
+using Users.Domain.Errors;
 
 namespace Users.Application.Users.Commands;
 
@@ -31,8 +32,7 @@ public class CreateUserHandler : IRequestHandler<CreateUser, Result<User>>
         var localUserResult = await _usersRepository.GetUserByEmailAsync(request.User.Email, cancellationToken);
         if (localUserResult != null)
         {
-            return Result<User>.Failure(new Error(409, "Conflict",
-                $"User with email {request.User.Email} already exists"));
+            return Result<User>.Failure(UserErrors.EmailAlreadyExists(request.User.Email));
         }
 
         // 2. Check if user exists in Keycloak

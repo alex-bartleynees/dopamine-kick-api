@@ -1,6 +1,7 @@
 using Common.Abstractions.Results;
 using Habits.Application.Abstractions;
 using Habits.Domain.Entities;
+using Habits.Domain.Errors;
 using Mediator;
 
 namespace Habits.Application.Habits.Queries;
@@ -15,7 +16,7 @@ public class GetHabitByIdHandler(IHabitsRepository habitsRepository) : IRequestH
 
         if (habit is null)
         {
-            return Result<Habit>.Failure(new Error(404, "Not Found", $"Habit with id {request.HabitId} was not found"));
+            return Result<Habit>.Failure(HabitErrors.NotFound(request.HabitId));
         }
 
         return Result<Habit>.Success(habit);

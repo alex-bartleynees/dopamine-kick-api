@@ -26,18 +26,25 @@ public class NotificationEndpointDefinitions : IEndpointDefinition
         notifications.MapDelete("subscriptions/{id:guid}", UnsubscribeFromPush).RequireAuthorization();
     }
 
-    private async Task<Results<NoContent, BadRequest<Error>>> SubscribeToPush(
+    private async Task<Results<NoContent, BadRequest<Error>, Conflict<Error>>> SubscribeToPush(
         Mediator.Mediator mediator, ClaimsPrincipal user, SubscribeToPushRequest request)
     {
         var userId = user.GetUserId();
 
         if (userId is null)
         {
-            return TypedResults.BadRequest(new Error(400, "BadRequest", "User ID not found in claims"));
+            return TypedResults.BadRequest(Error.Validation("Auth.MissingUserId", "User ID not found in claims"));
         }
 
-        await mediator.Send(
+        var result = await mediator.Send(
             new SubscribeToPushCommand(userId.Value, request.Endpoint, request.P256dh, request.Auth));
+
+        if (result.IsFailure)
+        {
+            return result.Error.Type == ErrorType.Conflict
+                ? TypedResults.Conflict(result.Error)
+                : TypedResults.BadRequest(result.Error);
+        }
 
         return TypedResults.NoContent();
     }
@@ -49,7 +56,7 @@ public class NotificationEndpointDefinitions : IEndpointDefinition
 
         if (userId is null)
         {
-            return TypedResults.BadRequest(new Error(400, "BadRequest", "User ID not found in claims"));
+            return TypedResults.BadRequest(Error.Validation("Auth.MissingUserId", "User ID not found in claims"));
         }
 
         var result = await mediator.Send(new UnsubscribeFromPushCommand(id, userId.Value));

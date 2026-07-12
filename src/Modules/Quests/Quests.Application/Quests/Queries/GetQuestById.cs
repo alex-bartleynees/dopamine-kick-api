@@ -2,6 +2,7 @@ using Common.Abstractions.Results;
 using Mediator;
 using Quests.Application.Abstractions;
 using Quests.Domain.Entities;
+using Quests.Domain.Errors;
 
 namespace Quests.Application.Quests.Queries;
 
@@ -15,7 +16,7 @@ public class GetQuestByIdHandler(IQuestsRepository questsRepository) : IRequestH
 
         if (quest is null)
         {
-            return Result<Quest>.Failure(new Error(404, "Not Found", $"Quest with id {request.QuestId} was not found"));
+            return Result<Quest>.Failure(QuestErrors.NotFound(request.QuestId));
         }
 
         return Result<Quest>.Success(quest);

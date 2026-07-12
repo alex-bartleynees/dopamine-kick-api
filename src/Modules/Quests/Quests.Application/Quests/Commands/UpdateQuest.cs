@@ -3,6 +3,7 @@ using Mediator;
 using Quests.Application.Abstractions;
 using Quests.Application.Common.Models;
 using Quests.Domain.Entities;
+using Quests.Domain.Errors;
 
 namespace Quests.Application.Quests.Commands;
 
@@ -16,7 +17,7 @@ public class UpdateQuestHandler(IQuestsRepository questsRepository, IQuestsUnitO
         var quest = await questsRepository.GetQuestByIdAsync(request.UserId, request.QuestId, cancellationToken);
         if (quest is null)
         {
-            return Result<Quest>.Failure(new Error(404, "Not Found", $"Quest with id {request.QuestId} was not found"));
+            return Result<Quest>.Failure(QuestErrors.NotFound(request.QuestId));
         }
 
         quest.Emoji = request.Quest.Emoji;

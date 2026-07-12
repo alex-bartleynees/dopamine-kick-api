@@ -1,4 +1,5 @@
 using Common.Abstractions.Results;
+using Habits.Domain.Errors;
 
 namespace Habits.Application.Habits.Queries;
 
@@ -11,12 +12,12 @@ internal static class CompletionHistoryWindow
     {
         if (days is < MinDays or > MaxDays)
         {
-            return new Error(400, "Bad Request", $"'days' must be between {MinDays} and {MaxDays}.");
+            return HabitCompletionErrors.InvalidDayRange(MinDays, MaxDays);
         }
 
         if (!TimeZoneInfo.TryFindSystemTimeZoneById(timezone, out var userTimeZone))
         {
-            return new Error(400, "Bad Request", $"'{timezone}' is not a valid IANA timezone identifier.");
+            return HabitCompletionErrors.InvalidTimezone(timezone);
         }
 
         var userLocalTime = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, userTimeZone);

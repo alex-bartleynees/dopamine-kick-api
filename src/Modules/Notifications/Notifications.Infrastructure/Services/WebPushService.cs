@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Notifications.Application.Abstractions;
 using Notifications.Domain.Entities;
+using Notifications.Domain.Errors;
 using Notifications.Infrastructure.DbContexts;
 using WebPush;
 
@@ -46,14 +47,14 @@ public class WebPushService(NotificationsContext context, IOptions<WebPushOption
             {
                 logger.LogWarning("Subscription {Id} expired (410 Gone), marking as inactive", subscription.Id);
                 subscription.IsActive = false;
-                return Result.Failure(new Error(410, "Subscription Expired", "Push subscription has expired"));
+                return Result.Failure(PushSubscriptionErrors.Expired());
             }
 
             if (ex.StatusCode == System.Net.HttpStatusCode.NotFound) // 404 - subscription not found
             {
                 logger.LogWarning("Subscription {Id} not found (404), marking as inactive", subscription.Id);
                 subscription.IsActive = false;
-                return Result.Failure(new Error(404, "Subscription Not Found", "Push subscription not found"));
+                return Result.Failure(PushSubscriptionErrors.NotFoundAtProvider());
             }
 
             // Other errors - increment failure count
@@ -69,7 +70,7 @@ public class WebPushService(NotificationsContext context, IOptions<WebPushOption
             logger.LogError(ex, "Failed to send notification to subscription {Id} (Attempt {Count})",
                 subscription.Id, subscription.FailureCount);
 
-            return Result.Failure(new Error((int?)ex.StatusCode ?? 500, "WebPush Send Failed", ex.Message));
+            return Result.Failure(PushSubscriptionErrors.SendFailed(ex.Message));
         }
         catch (Exception ex)
         {
@@ -84,7 +85,7 @@ public class WebPushService(NotificationsContext context, IOptions<WebPushOption
 
             logger.LogError(ex, "Unexpected error sending notification to subscription {Id}", subscription.Id);
 
-            return Result.Failure(new Error(500, "Unexpected Error", ex.Message));
+            return Result.Failure(PushSubscriptionErrors.Unexpected(ex.Message));
         }
     }
 

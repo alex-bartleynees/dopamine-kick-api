@@ -1,6 +1,7 @@
 using Common.Abstractions.Results;
 using Mediator;
 using Quests.Application.Abstractions;
+using Quests.Domain.Errors;
 
 namespace Quests.Application.Quests.Commands;
 
@@ -14,7 +15,7 @@ public class DeleteQuestHandler(IQuestsRepository questsRepository, IQuestsUnitO
         var quest = await questsRepository.GetQuestWithRemindersAsync(request.UserId, request.QuestId, cancellationToken);
         if (quest is null)
         {
-            return Result.Failure(new Error(404, "Not Found", $"Quest with id {request.QuestId} was not found"));
+            return Result.Failure(QuestErrors.NotFound(request.QuestId));
         }
 
         var cancellationMessages = quest.Reminders

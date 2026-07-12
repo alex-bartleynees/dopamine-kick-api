@@ -1,5 +1,6 @@
 using Common.Abstractions.Results;
 using Habits.Application.Abstractions;
+using Habits.Domain.Errors;
 using Mediator;
 
 namespace Habits.Application.Habits.Commands;
@@ -14,8 +15,7 @@ public class DeleteHabitReminderHandler(IHabitsRepository habitsRepository, IHab
         var reminder = await habitsRepository.GetReminderByIdAsync(request.UserId, request.ReminderId, cancellationToken);
         if (reminder is null)
         {
-            return Result.Failure(
-                new Error(404, "Not Found", $"Reminder with id {request.ReminderId} was not found"));
+            return Result.Failure(HabitReminderErrors.NotFound(request.ReminderId));
         }
 
         // Unschedule the push (no-op if no job exists), then remove the reminder.

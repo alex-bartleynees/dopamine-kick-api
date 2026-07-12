@@ -2,6 +2,7 @@ using Common.Abstractions.Results;
 using Mediator;
 using Notifications.Application.Abstractions;
 using Notifications.Domain.Entities;
+using Notifications.Domain.Errors;
 
 namespace Notifications.Application.WebPush;
 
@@ -23,7 +24,7 @@ public class SubscribeToPushCommandHandler(
 
         if (existingSubscription is not null)
         {
-            return Result.Failure(new Error(409, "Conflict", "Subscription already exists"));
+            return Result.Failure(PushSubscriptionErrors.AlreadyExists());
         }
 
         var subscription = new WebPushSubscription

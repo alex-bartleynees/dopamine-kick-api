@@ -2,6 +2,7 @@ using Common.Abstractions.Results;
 using Habits.Application.Abstractions;
 using Habits.Application.Common.Models;
 using Habits.Domain.Entities;
+using Habits.Domain.Errors;
 using Mediator;
 
 namespace Habits.Application.Habits.Commands;
@@ -16,7 +17,7 @@ public class UpdateHabitHandler(IHabitsRepository habitsRepository, IHabitsUnitO
         var habit = await habitsRepository.GetHabitByIdAsync(request.UserId, request.HabitId, cancellationToken);
         if (habit is null)
         {
-            return Result<Habit>.Failure(new Error(404, "Not Found", $"Habit with id {request.HabitId} was not found"));
+            return Result<Habit>.Failure(HabitErrors.NotFound(request.HabitId));
         }
 
         habit.Name = request.Habit.Name;

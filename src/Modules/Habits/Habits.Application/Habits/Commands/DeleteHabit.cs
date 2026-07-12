@@ -1,5 +1,6 @@
 using Common.Abstractions.Results;
 using Habits.Application.Abstractions;
+using Habits.Domain.Errors;
 using Mediator;
 
 namespace Habits.Application.Habits.Commands;
@@ -14,7 +15,7 @@ public class DeleteHabitHandler(IHabitsRepository habitsRepository, IHabitsUnitO
         var habit = await habitsRepository.GetHabitByIdAsync(request.UserId, request.HabitId, cancellationToken);
         if (habit is null)
         {
-            return Result.Failure(new Error(404, "Not Found", $"Habit with id {request.HabitId} was not found"));
+            return Result.Failure(HabitErrors.NotFound(request.HabitId));
         }
 
         // Cancel the pushes for every reminder before the rows are cascade-deleted,

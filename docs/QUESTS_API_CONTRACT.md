@@ -15,8 +15,15 @@ A **Quest** is a one-off task the user completes by a specific time. Unlike a Ha
 - **Enums** are serialized as **strings** (see `QuestStatus`).
 - **Error body** (returned on 4xx):
   ```json
-  { "status": 400, "title": "BadRequest", "detail": "Human readable message" }
+  {
+    "code": "Quests.NotFound",
+    "detail": "Human readable message",
+    "type": "NotFound",
+    "status": 404,
+    "title": "Not Found"
+  }
   ```
+  `status` and `title` still describe the HTTP result; `detail` is the human-readable message. `code` is a stable machine-readable identifier (e.g. `Quests.NotFound`) and `type` is the semantic category (`Failure`, `Validation`, `NotFound`, `Conflict`, `Unauthorized`, `Gone`) — both are additive and safe to ignore.
 
 ## Enums
 

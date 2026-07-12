@@ -1,6 +1,7 @@
 using Common.Abstractions.Results;
 using Habits.Application.Abstractions;
 using Habits.Application.Common.Models;
+using Habits.Domain.Errors;
 using Mediator;
 
 namespace Habits.Application.Habits.Commands;
@@ -16,8 +17,7 @@ public class UpdateHabitReminderHandler(IHabitsRepository habitsRepository, IHab
         var reminder = await habitsRepository.GetReminderByIdAsync(request.UserId, request.ReminderId, cancellationToken);
         if (reminder is null)
         {
-            return Result<Guid>.Failure(
-                new Error(404, "Not Found", $"Reminder with id {request.ReminderId} was not found"));
+            return Result<Guid>.Failure(HabitReminderErrors.NotFound(request.ReminderId));
         }
 
         reminder.NotificationTime = request.Reminder.NotificationTime;
@@ -30,8 +30,7 @@ public class UpdateHabitReminderHandler(IHabitsRepository habitsRepository, IHab
             var habit = await habitsRepository.GetHabitByIdAsync(request.UserId, reminder.HabitId, cancellationToken);
             if (habit is null)
             {
-                return Result<Guid>.Failure(
-                    new Error(404, "Not Found", $"Habit with id {reminder.HabitId} was not found"));
+                return Result<Guid>.Failure(HabitErrors.NotFound(reminder.HabitId));
             }
 
             // Enabled: (re)schedule with the new time/text.

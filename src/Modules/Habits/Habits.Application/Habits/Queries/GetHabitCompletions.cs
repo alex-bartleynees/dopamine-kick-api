@@ -1,6 +1,7 @@
 using Common.Abstractions.Results;
 using Habits.Application.Abstractions;
 using Habits.Application.Common.Models;
+using Habits.Domain.Errors;
 using Mediator;
 
 namespace Habits.Application.Habits.Queries;
@@ -23,7 +24,7 @@ public class GetHabitCompletionsHandler(IHabitsRepository habitsRepository)
         var habit = await habitsRepository.GetHabitByIdAsync(request.UserId, request.HabitId, cancellationToken);
         if (habit is null)
         {
-            return new Error(404, "Not Found", $"Habit with id {request.HabitId} was not found");
+            return HabitErrors.NotFound(request.HabitId);
         }
 
         var (from, to) = window.ValueOrThrow;

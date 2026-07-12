@@ -3,6 +3,7 @@ using Common.Abstractions.Results;
 using Common.IntegrationEvents.Habits;
 using Habits.Application.Abstractions;
 using Habits.Domain.Entities;
+using Habits.Domain.Errors;
 using Mediator;
 
 namespace Habits.Application.Habits.Commands;
@@ -23,7 +24,7 @@ public class CreateHabitReminderHandler(IHabitsRepository habitsRepository, IHab
         var habit = await habitsRepository.GetHabitByIdAsync(command.UserId, command.HabitId, cancellationToken);
         if (habit == null)
         {
-            return Result<Guid>.Failure(new Error(404, "Not Found", $"Habit with id: {command.HabitId} was not found"));
+            return Result<Guid>.Failure(HabitErrors.NotFound(command.HabitId));
         }
         
         var reminder = new HabitReminder

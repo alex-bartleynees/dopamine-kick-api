@@ -1,6 +1,7 @@
 using Common.Abstractions.Results;
 using Habits.Application.Abstractions;
 using Habits.Domain.Entities;
+using Habits.Domain.Errors;
 using Mediator;
 
 namespace Habits.Application.Habits.Commands;
@@ -15,7 +16,7 @@ public class CreateHabitCompletionHandler(IHabitsRepository habitsRepository, IH
         var habitEntity = await habitsRepository.GetHabitByIdAsync(request.UserId, request.HabitId, cancellationToken);
         if (habitEntity == null)
         {
-            return Result<HabitCompletion>.Failure(new Error(404, "Not Found", $"Habit with id: {request.HabitId} was not found"));
+            return Result<HabitCompletion>.Failure(HabitErrors.NotFound(request.HabitId));
         }
 
         var now = DateTimeOffset.UtcNow;
