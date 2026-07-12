@@ -33,4 +33,7 @@
     <Project Path="src/Shared/Common.Infrastructure/Common.Infrastructure.csproj" />
     <Project Path="src/Shared/Common.IntegrationEvents/Common.IntegrationEvents.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/WebApi.IntegrationTests/WebApi.IntegrationTests.csproj" />
+  </Folder>
 </Solution>
