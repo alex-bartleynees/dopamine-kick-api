@@ -52,6 +52,29 @@ services:
       timeout: 5s
       retries: 5
 
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+    ports:
+      - "4317:4317" # OTLP gRPC — apps export here
+      - "4318:4318" # OTLP HTTP
+    depends_on:
+      - aspire-dashboard
+
+  aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:latest
+    container_name: aspire-dashboard
+    environment:
+      # Dev only — skip the browser login token.
+      ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: "true"
+      # Bind the OTLP receiver on all interfaces so the collector container can reach it.
+      DOTNET_DASHBOARD_OTLP_ENDPOINT_URL: "http://0.0.0.0:18889"
+    ports:
+      - "18888:18888" # Dashboard UI — http://localhost:18888
+
   dotnet-web-api:
     build:
       context: .
@@ -90,6 +113,8 @@ services:
       rabbitmq:
         condition: service_healthy
         restart: true
+      otel-collector:
+        condition: service_started
       # seaweedfs:
       #   condition: service_healthy
       #   restart: true

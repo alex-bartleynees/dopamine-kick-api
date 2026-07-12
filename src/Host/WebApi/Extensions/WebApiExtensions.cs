@@ -18,6 +18,9 @@ public static class WebApiExtensions
 {
   public static void RegisterServices(this WebApplicationBuilder builder)
   {
+    // OpenTelemetry logs, metrics and traces exported over OTLP to the collector.
+    builder.AddObservability();
+
     // Add StackExchangeRedisCache service for Redis
     builder.Services.AddStackExchangeRedisCache(options =>
     {

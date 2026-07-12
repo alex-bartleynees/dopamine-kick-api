@@ -1,0 +1,38 @@
+# Dev OpenTelemetry Collector config.
+# Receives OTLP from the API (gRPC :4317 / HTTP :4318) and forwards traces,
+# metrics and logs to the standalone Aspire dashboard's OTLP endpoint.
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch: {}
+
+exporters:
+  # Forward everything to the Aspire dashboard's OTLP/gRPC receiver.
+  otlp/aspire:
+    endpoint: aspire-dashboard:18889
+    tls:
+      insecure: true
+  # Echo a summary to the collector logs — handy for debugging locally.
+  debug:
+    verbosity: basic
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/aspire, debug]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/aspire, debug]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/aspire, debug]
