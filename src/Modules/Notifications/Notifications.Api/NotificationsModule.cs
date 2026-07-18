@@ -45,12 +45,21 @@ public static class NotificationsModule
 
         services.AddQuartz(options =>
         {
+            options.SchedulerName = "dopamine-kick-scheduler";
+            options.SchedulerId = "AUTO";
+
             options.UsePersistentStore(c =>
             {
                 c.RetryInterval = TimeSpan.FromMinutes(2);
                 c.UseProperties = true;
                 c.PerformSchemaValidation = true;
                 c.UseSystemTextJsonSerializer();
+
+                c.UseClustering(cluster =>
+                {
+                    cluster.CheckinInterval = TimeSpan.FromSeconds(10);
+                    cluster.CheckinMisfireThreshold = TimeSpan.FromSeconds(20);
+                });
 
                 c.UsePostgres(postgres =>
                 {
