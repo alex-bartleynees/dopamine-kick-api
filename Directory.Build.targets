@@ -5,7 +5,7 @@
 
     <!-- Define module names -->
     <PropertyGroup>
-      <ModuleNames>Users;Habits;Notifications;Quests</ModuleNames>
+      <ModuleNames>Users;Habits;Notifications;Quests;Payments</ModuleNames>
     </PropertyGroup>
 
     <!-- Detect which module this project belongs to -->
@@ -19,6 +19,8 @@
       <CurrentModule Condition="$(MSBuildProjectDirectory.Contains('Modules/Notifications'))">Notifications</CurrentModule>
       <CurrentModule Condition="$(MSBuildProjectDirectory.Contains('Modules\Quests'))">Quests</CurrentModule>
       <CurrentModule Condition="$(MSBuildProjectDirectory.Contains('Modules/Quests'))">Quests</CurrentModule>
+      <CurrentModule Condition="$(MSBuildProjectDirectory.Contains('Modules\Payments'))">Payments</CurrentModule>
+      <CurrentModule Condition="$(MSBuildProjectDirectory.Contains('Modules/Payments'))">Payments</CurrentModule>
     </PropertyGroup>
 
     <!-- Only validate if this is a module project -->
@@ -32,6 +34,8 @@
                                   Condition="($([System.String]::Copy('%(Identity)').Contains('\Notifications\')) Or $([System.String]::Copy('%(Identity)').Contains('/Notifications/'))) And '$(CurrentModule)' != 'Notifications'" />
       <_ModuleBoundaryViolations Include="@(ProjectReference)"
                                   Condition="($([System.String]::Copy('%(Identity)').Contains('\Quests\')) Or $([System.String]::Copy('%(Identity)').Contains('/Quests/'))) And '$(CurrentModule)' != 'Quests'" />
+      <_ModuleBoundaryViolations Include="@(ProjectReference)"
+                                  Condition="($([System.String]::Copy('%(Identity)').Contains('\Payments\')) Or $([System.String]::Copy('%(Identity)').Contains('/Payments/'))) And '$(CurrentModule)' != 'Payments'" />
     </ItemGroup>
 
     <!-- Fail build if violations found -->

@@ -36,36 +36,52 @@ public class OutboxPublisher(
         using var scope = scopeFactory.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<QuestsContext>();
 
-        var messages = await context.OutboxMessages
-            .Where(m => !m.Published)
-            .OrderBy(m => m.CreatedAt)
-            .Take(50)
-            .ToListAsync(ct);
-
-        foreach (var message in messages)
+        // The context uses a retrying execution strategy, which forbids a user-initiated transaction
+        // unless it's run inside the strategy so the whole unit can be retried atomically.
+        var strategy = context.Database.CreateExecutionStrategy();
+        await strategy.ExecuteAsync(async () =>
         {
-            try
+            await using var transaction = await context.Database.BeginTransactionAsync(ct);
+
+            // FOR UPDATE SKIP LOCKED so multiple instances share the outbox without double-publishing:
+            // rows locked by another instance's in-flight transaction are skipped rather than re-sent.
+            var messages = await context.OutboxMessages
+                .FromSqlRaw(
+                    """
+                    SELECT * FROM "OutboxMessages"
+                    WHERE "Published" = false
+                    ORDER BY "CreatedAt"
+                    LIMIT 50
+                    FOR UPDATE SKIP LOCKED
+                    """)
+                .ToListAsync(ct);
+
+            foreach (var message in messages)
             {
-                var (@event, routingKey) = DeserializeEvent(message);
+                try
+                {
+                    var (@event, routingKey) = DeserializeEvent(message);
 
-                await messagePublisher.PublishAsync(@event, routingKey, ct);
+                    await messagePublisher.PublishAsync(@event, routingKey, ct);
 
-                message.Published = true;
-                message.PublishedAt = DateTimeOffset.UtcNow;
+                    message.Published = true;
+                    message.PublishedAt = DateTimeOffset.UtcNow;
 
-                logger.LogInformation(
-                    "Published {Type} with MessageId {MessageId} to RabbitMQ with routing key {RoutingKey}",
-                    message.Type,
-                    message.MessageId,
-                    routingKey);
+                    logger.LogInformation(
+                        "Published {Type} with MessageId {MessageId} to RabbitMQ with routing key {RoutingKey}",
+                        message.Type,
+                        message.MessageId,
+                        routingKey);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Failed to process quest outbox message {MessageId}", message.MessageId);
+                }
             }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Failed to process quest outbox message {MessageId}", message.MessageId);
-            }
-        }
 
-        await context.SaveChangesAsync(ct);
+            await context.SaveChangesAsync(ct);
+            await transaction.CommitAsync(ct);
+        });
     }
 
     private (object Event, string RoutingKey) DeserializeEvent(OutboxMessage message)

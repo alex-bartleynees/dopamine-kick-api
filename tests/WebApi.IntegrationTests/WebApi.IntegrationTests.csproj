@@ -29,6 +29,8 @@
     <ProjectReference Include="..\..\src\Host\WebApi\WebApi.csproj" />
     <ProjectReference Include="..\..\src\Modules\Habits\Habits.Domain\Habits.Domain.csproj" />
     <ProjectReference Include="..\..\src\Modules\Habits\Habits.Infrastructure\Habits.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Payments\Payments.Domain\Payments.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Payments\Payments.Infrastructure\Payments.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

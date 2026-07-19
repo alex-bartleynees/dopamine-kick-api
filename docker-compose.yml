@@ -88,6 +88,7 @@ services:
       ConnectionStrings__HabitsDBConnectionString: "Host=postgres;Port=5432;Database=habitsdb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}"
       ConnectionStrings__QuestsDBConnectionString: "Host=postgres;Port=5432;Database=questsdb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}"
       ConnectionStrings__NotificationsDBConnectionString: "Host=postgres;Port=5432;Database=notificationsdb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}"
+      ConnectionStrings__PaymentsDBConnectionString: "Host=postgres;Port=5432;Database=paymentsdb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}"
       ConnectionStrings__RedisConnection: "redis:6379"
       ConnectionStrings__OTLP_Endpoint: "http://otel-collector:4317"
       ASPNETCORE_ENVIRONMENT: "Development"
@@ -103,6 +104,10 @@ services:
       BlobStorage__ServiceUrl: "http://seaweedfs:8333"
       BlobStorage__PublicUrl: "http://localhost:8333"
       BlobStorage__BucketName: "user-profile-images"
+      Stripe__SecretKey: ${STRIPE_SECRET_KEY}
+      Stripe__PublishableKey: ${STRIPE_PUBLISHABLE_KEY}
+      Stripe__WebhookSecret: ${STRIPE_WEBHOOK_SECRET}
+      Stripe__PriceId: ${STRIPE_PRICEID}
     depends_on:
       postgres:
         condition: service_healthy

@@ -1,10 +1,12 @@
 using System.Text.Json.Serialization;
 using Common.Abstractions;
+using Payments.Domain.Billing;
 using Common.Abstractions.Messaging;
 using Common.Infrastructure.Messaging;
 using Habits.Api;
 using Microsoft.OpenApi;
 using Notifications.Api;
+using Payments.Api;
 using Quests.Api;
 using SharpGrip.FluentValidation.AutoValidation.Endpoints.Extensions;
 using StackExchange.Redis;
@@ -53,6 +55,7 @@ public static class WebApiExtensions
     builder.Services.AddHabitsModule(builder.Configuration);
     builder.Services.AddQuestsModule(builder.Configuration);
     builder.Services.AddNotificationsModule(builder.Configuration);
+    builder.Services.AddPaymentsModule(builder.Configuration);
 
     // Register RabbitMQ Options and Services
     builder.Services.Configure<RabbitMqOptions>(
@@ -69,6 +72,10 @@ public static class WebApiExtensions
     // Serialize enums as strings (e.g. QuestStatus) across all JSON endpoints
     builder.Services.ConfigureHttpJsonOptions(options =>
     {
+      // Registered before the generic converter: STJ uses the first matching converter in the
+      // collection, so SubscriptionStatus serializes to the billing contract's lower-case tokens
+      // (e.g. "past_due") rather than the enum member name.
+      options.SerializerOptions.Converters.Add(new SubscriptionStatusJsonConverter());
       options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
@@ -112,6 +119,7 @@ public static class WebApiExtensions
     app.Services.MigrateHabitsDatabase();
     app.Services.MigrateQuestsDatabase();
     app.Services.MigrateNotificationsDatabase();
+    app.Services.MigratePaymentsDatabase();
 
     if (app.Environment.IsDevelopment())
     {

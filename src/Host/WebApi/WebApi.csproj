@@ -38,6 +38,7 @@
     <ProjectReference Include="..\..\Modules\Habits\Habits.Api\Habits.Api.csproj" />
     <ProjectReference Include="..\..\Modules\Quests\Quests.Api\Quests.Api.csproj" />
     <ProjectReference Include="..\..\Modules\Notifications\Notifications.Api\Notifications.Api.csproj" />
+    <ProjectReference Include="..\..\Modules\Payments\Payments.Api\Payments.Api.csproj" />
   </ItemGroup>
 
 </Project>
