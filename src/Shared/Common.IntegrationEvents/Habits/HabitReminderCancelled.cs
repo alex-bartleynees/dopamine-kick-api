@@ -1,8 +1,8 @@
-using Common.Abstractions.Messaging;
+using SharedKernel.Messaging.Abstractions;
 
 namespace Common.IntegrationEvents.Habits;
 
-[IntegrationEventRoutingKey(MessagingConstants.HabitReminderCancelledKey)]
+[IntegrationEventRoutingKey(RoutingKeys.HabitReminderCancelledKey)]
 public record HabitReminderCancelled(
     Guid MessageId,
     Guid ReminderId,

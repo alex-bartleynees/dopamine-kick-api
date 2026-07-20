@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
-using Common.Abstractions;
+using SharedKernel.AspNetCore;
 using Payments.Domain.Billing;
-using Common.Abstractions.Messaging;
-using Common.Infrastructure.Messaging;
+using SharedKernel.Messaging.Abstractions;
+using SharedKernel.Messaging.RabbitMq;
 using Habits.Api;
 using Microsoft.OpenApi;
 using Notifications.Api;

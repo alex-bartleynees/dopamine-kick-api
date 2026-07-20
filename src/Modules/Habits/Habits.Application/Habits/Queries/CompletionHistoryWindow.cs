@@ -1,4 +1,4 @@
-using Common.Abstractions.Results;
+using SharedKernel.Results;
 using Habits.Domain.Errors;
 
 namespace Habits.Application.Habits.Queries;

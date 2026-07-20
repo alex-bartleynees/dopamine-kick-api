@@ -7,11 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common.Abstractions\Common.Abstractions.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Mediator.Abstractions" Version="3.1.0-rc.1" />
+    <PackageReference Include="SharedKernel.Messaging.Abstractions" Version="0.0.0-alpha.0.3" />
   </ItemGroup>
 
 </Project>

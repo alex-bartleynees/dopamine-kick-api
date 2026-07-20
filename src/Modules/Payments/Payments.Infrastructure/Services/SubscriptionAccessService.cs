@@ -1,4 +1,3 @@
-using Common.Abstractions.Billing;
 using Microsoft.EntityFrameworkCore;
 using Payments.Domain.Billing;
 using Payments.Infrastructure.DbContexts;

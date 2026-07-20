@@ -1,8 +1,8 @@
-using Common.Abstractions.Messaging;
+using SharedKernel.Messaging.Abstractions;
 
 namespace Common.IntegrationEvents.Quests;
 
-[IntegrationEventRoutingKey(MessagingConstants.QuestReminderCancelledKey)]
+[IntegrationEventRoutingKey(RoutingKeys.QuestReminderCancelledKey)]
 public record QuestReminderCancelled(
     Guid MessageId,
     Guid ReminderId,

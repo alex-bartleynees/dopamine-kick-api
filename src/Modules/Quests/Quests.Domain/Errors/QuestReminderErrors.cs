@@ -1,4 +1,4 @@
-using Common.Abstractions.Results;
+using SharedKernel.Results;
 
 namespace Quests.Domain.Errors;
 

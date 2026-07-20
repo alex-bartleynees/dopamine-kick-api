@@ -1,4 +1,4 @@
-using Common.Abstractions.Results;
+using SharedKernel.Results;
 
 namespace Notifications.Domain.Errors;
 

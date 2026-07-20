@@ -1,4 +1,4 @@
-using Common.Infrastructure.Interceptors;
+using SharedKernel.EntityFrameworkCore;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

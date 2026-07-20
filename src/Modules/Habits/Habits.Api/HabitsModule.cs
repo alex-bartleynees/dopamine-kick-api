@@ -1,4 +1,4 @@
-using Common.Infrastructure.Interceptors;
+using SharedKernel.EntityFrameworkCore;
 using FluentValidation;
 using Habits.Application.Abstractions;
 using Habits.Application.Common.Models;

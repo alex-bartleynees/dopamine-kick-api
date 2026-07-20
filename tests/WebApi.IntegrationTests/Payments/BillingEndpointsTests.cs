@@ -1,6 +1,5 @@
 using System.Net;
 using System.Net.Http.Json;
-using Common.Abstractions.Billing;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Payments.Domain.Billing;

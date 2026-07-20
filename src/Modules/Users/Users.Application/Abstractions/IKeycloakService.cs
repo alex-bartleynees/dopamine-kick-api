@@ -1,4 +1,4 @@
-using Common.Abstractions.Results;
+using SharedKernel.Results;
 using Users.Application.Common.Models;
 
 namespace Users.Application.Abstractions;

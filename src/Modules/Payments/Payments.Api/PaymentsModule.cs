@@ -1,5 +1,5 @@
-using Common.Abstractions.Billing;
-using Common.Infrastructure.Interceptors;
+using Payments.Domain.Billing;
+using SharedKernel.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

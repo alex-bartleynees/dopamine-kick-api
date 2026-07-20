@@ -16,8 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\Common.Abstractions\Common.Abstractions.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Common.Infrastructure\Common.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\Shared\Common.IntegrationEvents\Common.IntegrationEvents.csproj" />
     <ProjectReference Include="..\Quests.Application\Quests.Application.csproj" />
     <ProjectReference Include="..\Quests.Domain\Quests.Domain.csproj" />

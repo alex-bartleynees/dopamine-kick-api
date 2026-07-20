@@ -37,6 +37,32 @@ DopamineKick monolith ◄── consumes ─────────────
 The gateway owns all Stripe state. Products never read Stripe or the gateway DB — they react to events
 and gate off their own copy.
 
+## Enforcement stance (v1)
+
+The whole app is subscription-gated (2-week free trial via Stripe `trialing`, then a paid subscription;
+there is no free tier). **Today that gate is enforced only at the frontend/BFF, not at the API** — this
+is a deliberate, recorded **accepted risk** for v1, not an oversight:
+
+- `RequireActiveSubscriptionFilter` + `ISubscriptionAccessService` exist and are DI-registered, but the
+  filter is applied to **zero endpoints**. It is scaffolding for the seam above, not an active gate.
+  Nothing in the API currently checks subscription status.
+- The SPA holds only an opaque session **cookie**; JWTs live server-side in the **BFF** (silent-refreshed).
+  So there is no bearer token a user can lift from devtools and replay, which removes token theft and
+  scripted/mass abuse from the threat model.
+- Residual risk: a *technical* user reusing their own authenticated session against endpoints the SPA
+  hides (to the extent the BFF exposes/proxies them) could keep using the app after their trial lapses,
+  because the BFF keeps minting fresh valid tokens and the API does not check entitlement. For a
+  single-product habit tracker this is low blast-radius (no data-breach or cost-blowout dimension), so
+  FE/BFF gating is accepted for v1.
+- **When real enforcement is wanted it belongs at the API** (the resource server owns authorization), not
+  the BFF — putting entitlement logic in the FE tier couples billing into it and gets worse post-extraction.
+  Because the whole app is gated (not a few premium endpoints), enforce it **globally** — a fallback
+  authorization policy / post-authentication middleware, not per-endpoint `.AddEndpointFilter` opt-in —
+  with an **exemption allowlist** for the endpoints an unsubscribed user must still reach (billing:
+  ensure-customer / checkout / portal / get-subscription-state; the anonymous Stripe webhook; health; auth),
+  or new users can never reach checkout to subscribe. The cheap per-request check is the cached
+  `Entitlements` read-model introduced below (§4), not a per-request cross-context DB join.
+
 ## What changes
 
 ### 1. Multi-product data model (in the Payments projects, before/at extraction)
@@ -44,30 +70,45 @@ and gate off their own copy.
   `InboxMessage` — files `src/Modules/Payments/Payments.Domain/Entities/*.cs` + their configs in
   `Payments.Infrastructure/Configuration/*.cs`.
 - `CustomerMapping` key → composite `(ProductId, UserId)` (same person can subscribe to multiple
-  products = distinct Stripe customers). Keep the unique index on `StripeCustomerId`.
-- `SubscriptionState` stays keyed on `StripeCustomerId`; add `ProductId` column + index for scoping.
+  products = distinct Stripe customers). Keep the unique index on `CustomerReference`.
+- `SubscriptionState` stays keyed on `CustomerReference`; add `ProductId` column + index for scoping.
+  (`InboxMessage` dedups on `EventReference`; add `ProductId` there too.)
 - New EF migration + **backfill** existing rows with `productId = "dopamine-kick"`.
+
+> Note: the opaque-id columns were renamed by the `RenameProviderReferenceColumns` migration in the
+> ACL refactor — `StripeCustomerId → CustomerReference`, `SubscriptionId → SubscriptionReference`,
+> `StripeEventId → EventReference`. This plan uses the current names.
 
 ### 2. Product registry + per-product config
 - Replace single `StripeOptions` (`Payments.Infrastructure/Configuration/StripeOptions.cs`) with a
   `ProductBillingOptions` map keyed by `productId`: `{ PriceId(s), TrialPeriodDays, SuccessUrl,
   CancelUrl, PortalReturnUrl, allowed JWT audience/client }`. Single Stripe secret + webhook secret
   stay global (one account).
-- `StripeService` (`Payments.Infrastructure/Services/StripeService.cs`) takes `productId` on each call;
-  sets `metadata.productId` + `metadata.userId` on customer/subscription creation so webhooks can
-  resolve the product.
+- The Stripe adapter is now `StripePaymentGateway` (`Payments.Infrastructure/Services/StripePaymentGateway.cs`,
+  the **sole** file importing the Stripe SDK), behind the `IPaymentGateway` port
+  (`Payments.Application/Abstractions/IPaymentGateway.cs`). Add a `productId` parameter to its methods
+  (`CreateCustomerAsync`, `CreateCheckoutSessionUrlAsync`, `CreatePortalSessionUrlAsync`) and set
+  `metadata.productId` + `metadata.userId` on customer/subscription creation so webhooks can resolve the
+  product. Because the ACL is already the only Stripe-facing seam, this is a localised change.
 - **Product resolution:** user-facing endpoints derive `productId` from the request (subdomain, a
   validated `product` param, or a client/audience claim). Webhooks resolve `productId` from the
-  subscription/price/customer metadata (no trust in payload beyond routing — same as today).
+  subscription/price/customer metadata inside `StripePaymentGateway.ParseWebhookEvent`, carrying it out
+  on `PaymentProviderNotification` (no trust in payload beyond routing — same as today).
 
 ### 3. Entitlement events (the decoupling contract)
 - New integration event `SubscriptionEntitlementChanged { ProductId, UserId, Status, HasAccess,
   CurrentPeriodEnd, CancelAtPeriodEnd }` in `Common.IntegrationEvents/Payments/` (shared contract).
+  Carry `Status` as its stable lower-case **token** (`SubscriptionStatusTokens.ToToken`), not the raw
+  enum — the wire contract must not depend on the Host's converter registration order (the STJ
+  converter-ordering gotcha), and consuming products don't reference `Payments.Domain`. Consumers parse
+  with `FromToken` (or just read `HasAccess`).
 - `SubscriptionSyncService` (`Payments.Infrastructure/Services/SubscriptionSyncService.cs`), after the
   full-overwrite upsert, writes an **outbox** row for this event in the same transaction. Reuse the
   existing `OutboxPublisher` + SKIP-LOCKED pattern (copy from Habits/Quests) — add `OutboxMessages` to
-  `PaymentsContext`. `HasAccess` is computed canonically in the gateway (active/trialing/past-due grace,
-  the logic currently in `SubscriptionAccessService`).
+  `PaymentsContext`. `HasAccess` is computed canonically in the gateway via `state.Status.GrantsAccess()`
+  — the single access rule now lives in `SubscriptionStatusTokens.GrantsAccess` (`Payments.Domain/Billing/`),
+  which `SubscriptionAccessService` already delegates to. Because products can't reference that domain
+  type, shipping the computed `HasAccess` in the event is deliberate, not redundant.
 
 ### 4. DopamineKick monolith side (strangler-friendly)
 - New lightweight `Entitlements` consumer (mirror `Notifications.Infrastructure/BackgroundServices/*ConsumerService.cs`):
@@ -77,6 +118,7 @@ and gate off their own copy.
   to read the local `Entitlements` table instead of `PaymentsContext`. **The Host filter
   `src/Host/WebApi/Filters/RequireActiveSubscriptionFilter.cs` stays byte-for-byte identical** — only
   the implementation behind the interface changes. This is the clean seam that makes the split low-risk.
+  (See [Enforcement stance](#enforcement-stance-v1) — the filter is currently an *unapplied* seam.)
 - Remove the Payments module projects + billing endpoints from the monolith (`src/Modules/Payments/**`,
   `AddPaymentsModule`/`MigratePaymentsDatabase` in `WebApiExtensions.cs`, `.slnx`,
   `Directory.Build.targets`, `PaymentsDBConnectionString`, Stripe config).
@@ -121,6 +163,13 @@ and gate off their own copy.
   B). Confirm the durable inbox still dedups redelivered webhooks per product.
 
 ## Notes / non-goals
+- **ACL already landed** (in the `Add payments module` commit, after this plan was first drafted): the
+  Stripe boundary is fully behind `IPaymentGateway`/`StripePaymentGateway`, domain DTOs are
+  `SubscriptionSnapshot`/`PaymentProviderNotification`, status is the `SubscriptionStatus` domain enum
+  with tokens/access rule centralised in `SubscriptionStatusTokens`, and provider ids are opaque
+  `*Reference` columns. The extraction is now a smaller job than originally scoped — no vendor types
+  leak past the adapter, and `SubscriptionSyncService.SyncAsync(string customerReference)` is the single
+  overwrite point to hook the entitlement outbox into.
 - Keep the inbox + SKIP-LOCKED poller and the `EnableRetryOnFailure` → `CreateExecutionStrategy` wrapping
   already in place; they carry over unchanged.
 - FE contract update: `docs/PAYMENTS_API_CONTRACT.md` base URL becomes the gateway host and endpoints gain

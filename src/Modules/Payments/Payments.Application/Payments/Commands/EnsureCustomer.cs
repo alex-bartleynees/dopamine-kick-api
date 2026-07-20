@@ -1,5 +1,5 @@
 using Ardalis.GuardClauses;
-using Common.Abstractions.Results;
+using SharedKernel.Results;
 using Mediator;
 using Payments.Application.Abstractions;
 

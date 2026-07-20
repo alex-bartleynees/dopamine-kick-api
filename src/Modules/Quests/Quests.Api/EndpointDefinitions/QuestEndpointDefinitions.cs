@@ -1,5 +1,5 @@
-using Common.Abstractions;
-using Common.Abstractions.Results;
+using SharedKernel.AspNetCore;
+using SharedKernel.Results;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;

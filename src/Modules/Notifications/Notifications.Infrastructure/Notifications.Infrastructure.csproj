@@ -20,8 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\Common.Abstractions\Common.Abstractions.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Common.Infrastructure\Common.Infrastructure.csproj" />
+    <PackageReference Include="SharedKernel.Messaging.Abstractions" Version="0.0.0-alpha.0.3" />
+    <PackageReference Include="SharedKernel.Results" Version="0.0.0-alpha.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\Common.IntegrationEvents\Common.IntegrationEvents.csproj" />
     <ProjectReference Include="..\Notifications.Application\Notifications.Application.csproj" />
     <ProjectReference Include="..\Notifications.Domain\Notifications.Domain.csproj" />

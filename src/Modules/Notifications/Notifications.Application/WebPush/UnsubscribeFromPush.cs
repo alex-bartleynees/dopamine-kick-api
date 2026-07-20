@@ -1,4 +1,4 @@
-using Common.Abstractions.Results;
+using SharedKernel.Results;
 using Mediator;
 using Notifications.Application.Abstractions;
 using Notifications.Domain.Errors;

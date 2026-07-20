@@ -1,4 +1,4 @@
-using Common.Abstractions;
+using SharedKernel.Abstractions;
 using Payments.Domain.Billing;
 
 namespace Payments.Domain.Entities;

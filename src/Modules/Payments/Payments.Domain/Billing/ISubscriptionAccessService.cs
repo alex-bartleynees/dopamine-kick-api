@@ -1,4 +1,4 @@
-namespace Common.Abstractions.Billing;
+namespace Payments.Domain.Billing;
 
 /// <summary>
 /// Cross-module read of a user's subscription entitlement. Declared here as a shared

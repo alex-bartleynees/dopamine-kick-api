@@ -7,8 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\Common.Abstractions\Common.Abstractions.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Common.Infrastructure\Common.Infrastructure.csproj" />
+    <PackageReference Include="SharedKernel.Abstractions" Version="0.0.0-alpha.0.3" />
+    <PackageReference Include="SharedKernel.AspNetCore" Version="0.0.0-alpha.0.3" />
+    <PackageReference Include="SharedKernel.EntityFrameworkCore" Version="0.0.0-alpha.0.3" />
+    <PackageReference Include="SharedKernel.Results" Version="0.0.0-alpha.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Quests.Infrastructure\Quests.Infrastructure.csproj" />
   </ItemGroup>
 

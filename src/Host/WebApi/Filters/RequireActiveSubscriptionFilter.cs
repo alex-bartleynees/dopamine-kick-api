@@ -1,5 +1,5 @@
-using Common.Abstractions.Billing;
-using Common.Abstractions.Extensions;
+using Payments.Domain.Billing;
+using SharedKernel.Abstractions;
 using Microsoft.AspNetCore.Http;
 
 namespace WebApi.Filters;

@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Common.Abstractions.Results;
+using SharedKernel.Results;
 using Common.IntegrationEvents.Habits;
 using Habits.Application.Abstractions;
 using Habits.Application.Common.Models;

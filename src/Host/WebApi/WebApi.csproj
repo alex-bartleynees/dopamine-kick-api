@@ -33,7 +33,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Shared\Common.Abstractions\Common.Abstractions.csproj" />
+    <PackageReference Include="SharedKernel.Abstractions" Version="0.0.0-alpha.0.3" />
+    <PackageReference Include="SharedKernel.AspNetCore" Version="0.0.0-alpha.0.3" />
+    <PackageReference Include="SharedKernel.Messaging.Abstractions" Version="0.0.0-alpha.0.3" />
+    <PackageReference Include="SharedKernel.Messaging.RabbitMq" Version="0.0.0-alpha.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Modules\Users\Users.Api\Users.Api.csproj" />
     <ProjectReference Include="..\..\Modules\Habits\Habits.Api\Habits.Api.csproj" />
     <ProjectReference Include="..\..\Modules\Quests\Quests.Api\Quests.Api.csproj" />

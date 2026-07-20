@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Common.Abstractions.Messaging;
+using SharedKernel.Messaging.Abstractions;
 using Habits.Domain.Entities;
 using Habits.Infrastructure.DbContexts;
 using Microsoft.EntityFrameworkCore;
@@ -62,7 +62,7 @@ public class OutboxPublisher(
                 {
                     var (@event, routingKey) = DeserializeEvent(message);
 
-                    await messagePublisher.PublishAsync(@event, routingKey, ct);
+                    await messagePublisher.PublishAsync(@event, routingKey, cancellationToken: ct);
 
                     message.Published = true;
                     message.PublishedAt = DateTimeOffset.UtcNow;

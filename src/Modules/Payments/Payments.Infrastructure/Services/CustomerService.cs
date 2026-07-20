@@ -1,4 +1,4 @@
-using Common.Abstractions.Results;
+using SharedKernel.Results;
 using Payments.Application.Abstractions;
 using Payments.Domain.Entities;
 using Payments.Domain.Errors;

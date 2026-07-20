@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using Common.Abstractions;
+using SharedKernel.Abstractions;
 
 namespace Quests.Domain.Entities;
 

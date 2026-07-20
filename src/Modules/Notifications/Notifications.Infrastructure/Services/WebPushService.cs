@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Common.Abstractions.Results;
+using SharedKernel.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

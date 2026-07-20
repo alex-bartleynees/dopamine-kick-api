@@ -1,8 +1,8 @@
-using Common.Abstractions.Messaging;
+using SharedKernel.Messaging.Abstractions;
 
 namespace Common.IntegrationEvents.Quests;
 
-[IntegrationEventRoutingKey(MessagingConstants.QuestReminderCreatedKey)]
+[IntegrationEventRoutingKey(RoutingKeys.QuestReminderCreatedKey)]
 public record QuestReminderCreated(
     Guid MessageId,
     Guid ReminderId,
