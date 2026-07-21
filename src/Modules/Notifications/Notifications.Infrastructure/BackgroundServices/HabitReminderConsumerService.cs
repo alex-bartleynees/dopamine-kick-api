@@ -1,4 +1,5 @@
-using Common.Abstractions.Messaging;
+using SharedKernel.Messaging.Abstractions;
+using Common.IntegrationEvents;
 using Common.IntegrationEvents.Habits;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,7 +19,7 @@ public class HabitReminderConsumerService(
 
         await consumer.Subscribe<HabitReminderCreated>(
             queueName: "notifications.habit-reminders",
-            routingKey: MessagingConstants.HabitReminderCreatedKey,
+            routingKey: RoutingKeys.HabitReminderCreatedKey,
             handler: async @event =>
             {
                 using var scope = serviceScopeFactory.CreateScope();
@@ -28,7 +29,7 @@ public class HabitReminderConsumerService(
 
         await consumer.Subscribe<HabitReminderCancelled>(
             queueName: "notifications.habit-reminders-cancelled",
-            routingKey: MessagingConstants.HabitReminderCancelledKey,
+            routingKey: RoutingKeys.HabitReminderCancelledKey,
             handler: async @event =>
             {
                 using var scope = serviceScopeFactory.CreateScope();

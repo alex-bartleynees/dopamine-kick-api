@@ -1,6 +1,6 @@
-using Common.Abstractions.Messaging;
-using Common.Infrastructure.Interceptors;
-using Common.Infrastructure.Messaging;
+using SharedKernel.Messaging.Abstractions;
+using SharedKernel.EntityFrameworkCore;
+using SharedKernel.Messaging.RabbitMq;
 using Common.IntegrationEvents.Habits;
 using Common.IntegrationEvents.Quests;
 using Microsoft.EntityFrameworkCore;

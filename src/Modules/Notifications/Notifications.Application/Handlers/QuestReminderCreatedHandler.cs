@@ -1,4 +1,4 @@
-using Common.Abstractions.Messaging;
+using SharedKernel.Messaging.Abstractions;
 using Common.IntegrationEvents.Quests;
 using Microsoft.Extensions.Logging;
 using Notifications.Application.Abstractions;

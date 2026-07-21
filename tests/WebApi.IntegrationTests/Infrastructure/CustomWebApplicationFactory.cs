@@ -26,6 +26,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         "ConnectionStrings__HabitsDBConnectionString",
         "ConnectionStrings__QuestsDBConnectionString",
         "ConnectionStrings__NotificationsDBConnectionString",
+        "ConnectionStrings__EntitlementsDBConnectionString",
         "ConnectionStrings__RedisConnection",
         "RabbitMQ__HostName",
         "RabbitMQ__Port",
@@ -49,6 +50,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             ["ConnectionStrings__HabitsDBConnectionString"] = containers.ConnectionStrings["habitsdb"],
             ["ConnectionStrings__QuestsDBConnectionString"] = containers.ConnectionStrings["questsdb"],
             ["ConnectionStrings__NotificationsDBConnectionString"] = containers.ConnectionStrings["notificationsdb"],
+            ["ConnectionStrings__EntitlementsDBConnectionString"] = containers.ConnectionStrings["entitlementsdb"],
             ["ConnectionStrings__RedisConnection"] = containers.RedisConnectionString,
 
             ["RabbitMQ__HostName"] = containers.RabbitMqHost,

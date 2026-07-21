@@ -1,4 +1,4 @@
-using Common.Abstractions;
+using SharedKernel.Abstractions;
 
 namespace Users.Domain.Entities;
 

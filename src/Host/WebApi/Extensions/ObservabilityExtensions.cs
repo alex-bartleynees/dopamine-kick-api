@@ -1,4 +1,4 @@
-using Common.Abstractions.Telemetry;
+using WebApi.Telemetry;
 using Npgsql;
 using OpenTelemetry;
 using OpenTelemetry.Context.Propagation;

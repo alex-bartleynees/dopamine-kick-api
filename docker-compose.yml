@@ -75,6 +75,40 @@ services:
     ports:
       - "18888:18888" # Dashboard UI — http://localhost:18888
 
+  payments-gateway:
+    container_name: payments-gateway
+    image: creativefree/payments-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_HTTP_PORTS: 8080
+      ConnectionStrings__PaymentsDBConnectionString: "Host=postgres;Port=5432;Database=paymentsdb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}"
+      ASPNETCORE_ENVIRONMENT: "Development"
+      RabbitMQ__HostName: "rabbitmq"
+      RabbitMQ__Port: 5672
+      RabbitMQ__UserName: "alexbn"
+      RabbitMQ__Password: ${RABBITMQ_DEFAULT_PASS}
+      RabbitMQ__VirtualHost: "/"
+      Stripe__SecretKey: ${STRIPE_SECRET_KEY}
+      Stripe__PublishableKey: ${STRIPE_PUBLISHABLE_KEY}
+      Stripe__WebhookSecret: ${STRIPE_WEBHOOK_SECRET}
+      Products__dopamine-kick__PriceId: ${STRIPE_PRICEID}
+      Products__dopamine-kick__SuccessUrl: "http://localhost:3000/success"
+      Products__dopamine-kick__CancelUrl: "http://localhost:3000/pricing"
+      Products__dopamine-kick__PortalReturnUrl: "http://localhost:3000/account"
+    depends_on:
+      postgres:
+        condition: service_healthy
+        restart: true
+      redis:
+        condition: service_healthy
+        restart: true
+      rabbitmq:
+        condition: service_healthy
+        restart: true
+      otel-collector:
+        condition: service_started
+
   dotnet-web-api:
     build:
       context: .
@@ -88,6 +122,7 @@ services:
       ConnectionStrings__HabitsDBConnectionString: "Host=postgres;Port=5432;Database=habitsdb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}"
       ConnectionStrings__QuestsDBConnectionString: "Host=postgres;Port=5432;Database=questsdb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}"
       ConnectionStrings__NotificationsDBConnectionString: "Host=postgres;Port=5432;Database=notificationsdb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}"
+      ConnectionStrings__EntitlementsDBConnectionString: "Host=postgres;Port=5432;Database=entitlementsdb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}"
       ConnectionStrings__RedisConnection: "redis:6379"
       ConnectionStrings__OTLP_Endpoint: "http://otel-collector:4317"
       ASPNETCORE_ENVIRONMENT: "Development"
@@ -138,6 +173,20 @@ services:
       ForwardedHeaders__KnownNetworks__0: "0.0.0.0/0"
       Redis__Host: "redis:6379"
       ReverseProxy__Clusters__product-feedback-api__Destinations__destination1__Address: "http://minimalapiapp:5009/"
+      # Route billing traffic to the payments-gateway instead of the monolith.
+      # payments-gateway now requires a {productId} path segment that the FE never sends,
+      # so the PathPattern transform injects the single product's id ("dopamine-kick") on the way out.
+      ReverseProxy__Routes__billing-route__Order: "-10"
+      ReverseProxy__Routes__billing-route__ClusterId: "payments-gateway"
+      ReverseProxy__Routes__billing-route__Match__Path: "/api/billing/{**remainder}"
+      ReverseProxy__Routes__billing-route__Transforms__0__PathPattern: "/api/billing/dopamine-kick/{**remainder}"
+      # The Stripe webhook isn't under the {productId} group and must pass through unmodified
+      # and unauthenticated (Stripe verifies its own signature) - must be evaluated before billing-route.
+      ReverseProxy__Routes__billing-webhook-route__Order: "-20"
+      ReverseProxy__Routes__billing-webhook-route__ClusterId: "payments-gateway"
+      ReverseProxy__Routes__billing-webhook-route__Match__Path: "/api/billing/webhook"
+      ReverseProxy__Routes__billing-webhook-route__Match__Methods__0: "POST"
+      ReverseProxy__Clusters__payments-gateway__Destinations__destination1__Address: "http://payments-gateway:8080/"
       KEYCLOAK_SERVER_URL: "https://identity.alexbartleynees.com"
       OpenIdConnectOptions__ClientSecret: ${CLIENT_SECRET}
       OpenIdConnectOptions__ClientId: dopamine-kick
@@ -149,6 +198,8 @@ services:
         condition: service_healthy
         restart: true
       dotnet-web-api:
+        condition: service_started
+      payments-gateway:
         condition: service_started
 
 volumes:

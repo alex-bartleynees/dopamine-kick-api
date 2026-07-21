@@ -1,4 +1,4 @@
-using Common.Abstractions.Results;
+using SharedKernel.Results;
 using Habits.Application.Abstractions;
 using Habits.Domain.Entities;
 using Habits.Domain.Errors;

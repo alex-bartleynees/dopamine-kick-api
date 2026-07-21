@@ -9,7 +9,11 @@ WORKDIR /src
 
 # Copy project files preserving directory structure (requires BuildKit)
 COPY --parents src/**/*.csproj .
-RUN dotnet restore "src/Host/WebApi/WebApi.csproj"
+COPY nuget.config .
+# SharedKernel.* resolves from GitHub Packages (see nuget.config); the token is passed as a
+# BuildKit secret so it never lands in an image layer or the build cache.
+RUN --mount=type=secret,id=github_packages_token \
+    GITHUB_PACKAGES_TOKEN=$(cat /run/secrets/github_packages_token) dotnet restore "src/Host/WebApi/WebApi.csproj"
 
 COPY . .
 WORKDIR /src/src/Host/WebApi

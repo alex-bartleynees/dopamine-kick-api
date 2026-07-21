@@ -22,6 +22,11 @@
     <Project Path="src/Modules/Notifications/Notifications.Domain/Notifications.Domain.csproj" />
     <Project Path="src/Modules/Notifications/Notifications.Infrastructure/Notifications.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/Modules/Entitlements/">
+    <Project Path="src/Modules/Entitlements/Entitlements.Api/Entitlements.Api.csproj" />
+    <Project Path="src/Modules/Entitlements/Entitlements.Domain/Entitlements.Domain.csproj" />
+    <Project Path="src/Modules/Entitlements/Entitlements.Infrastructure/Entitlements.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/src/Modules/Users/">
     <Project Path="src/Modules/Users/Users.Api/Users.Api.csproj" />
     <Project Path="src/Modules/Users/Users.Application/Users.Application.csproj" />
@@ -29,8 +34,6 @@
     <Project Path="src/Modules/Users/Users.Infrastructure/Users.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/Shared/">
-    <Project Path="src/Shared/Common.Abstractions/Common.Abstractions.csproj" />
-    <Project Path="src/Shared/Common.Infrastructure/Common.Infrastructure.csproj" />
     <Project Path="src/Shared/Common.IntegrationEvents/Common.IntegrationEvents.csproj" />
   </Folder>
   <Folder Name="/tests/">

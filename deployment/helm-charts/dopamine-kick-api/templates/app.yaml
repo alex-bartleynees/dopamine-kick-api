@@ -60,6 +60,11 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.database.secretName }}
                   key: {{ .Values.database.questsDbConnectionStringKey }}
+            - name: ConnectionStrings__EntitlementsDBConnectionString
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.secretName }}
+                  key: {{ .Values.database.entitlementsDbConnectionStringKey }}
             - name: ConnectionStrings__NotificationsDBConnectionString
               valueFrom:
                 secretKeyRef:

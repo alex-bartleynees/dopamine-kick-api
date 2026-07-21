@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using Common.Abstractions;
-using Common.Abstractions.Extensions;
-using Common.Abstractions.Results;
+using SharedKernel.AspNetCore;
+using SharedKernel.Abstractions;
+using SharedKernel.Results;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;

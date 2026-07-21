@@ -1,5 +1,5 @@
-using Common.Abstractions.Extensions;
-using Common.Abstractions.Results;
+using SharedKernel.Abstractions;
+using SharedKernel.Results;
 using Microsoft.AspNetCore.Http;
 
 namespace Habits.Api.Filters;

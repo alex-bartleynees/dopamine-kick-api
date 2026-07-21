@@ -1,4 +1,5 @@
-using Common.Abstractions.Messaging;
+using SharedKernel.Messaging.Abstractions;
+using Common.IntegrationEvents;
 using Common.IntegrationEvents.Quests;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,7 +19,7 @@ public class QuestReminderConsumerService(
 
         await consumer.Subscribe<QuestReminderCreated>(
             queueName: "notifications.quest-reminders",
-            routingKey: MessagingConstants.QuestReminderCreatedKey,
+            routingKey: RoutingKeys.QuestReminderCreatedKey,
             handler: async @event =>
             {
                 using var scope = serviceScopeFactory.CreateScope();
@@ -28,7 +29,7 @@ public class QuestReminderConsumerService(
 
         await consumer.Subscribe<QuestReminderCancelled>(
             queueName: "notifications.quest-reminders-cancelled",
-            routingKey: MessagingConstants.QuestReminderCancelledKey,
+            routingKey: RoutingKeys.QuestReminderCancelledKey,
             handler: async @event =>
             {
                 using var scope = serviceScopeFactory.CreateScope();

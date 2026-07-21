@@ -1,8 +1,8 @@
-using Common.Abstractions.Messaging;
+using SharedKernel.Messaging.Abstractions;
 
 namespace Common.IntegrationEvents.Habits;
 
-[IntegrationEventRoutingKey(MessagingConstants.HabitReminderCreatedKey)]
+[IntegrationEventRoutingKey(RoutingKeys.HabitReminderCreatedKey)]
 public record HabitReminderCreated(
     Guid MessageId,
     Guid ReminderId,

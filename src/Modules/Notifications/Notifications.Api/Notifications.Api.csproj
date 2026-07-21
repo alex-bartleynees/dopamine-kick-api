@@ -14,9 +14,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.4" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Quartz" Version="3.15.1" />
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.15.1" />
@@ -25,7 +25,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\Common.Infrastructure\Common.Infrastructure.csproj" />
+    <PackageReference Include="SharedKernel.Abstractions" Version="0.0.0-alpha.0.3" />
+    <PackageReference Include="SharedKernel.AspNetCore" Version="0.0.0-alpha.0.3" />
+    <PackageReference Include="SharedKernel.EntityFrameworkCore" Version="0.0.0-alpha.0.3" />
+    <PackageReference Include="SharedKernel.Messaging.Abstractions" Version="0.0.0-alpha.0.3" />
+    <PackageReference Include="SharedKernel.Messaging.RabbitMq" Version="0.0.0-alpha.0.3" />
+    <PackageReference Include="SharedKernel.Results" Version="0.0.0-alpha.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Notifications.Infrastructure\Notifications.Infrastructure.csproj" />
   </ItemGroup>
 

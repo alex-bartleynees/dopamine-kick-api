@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Common.Abstractions.Results;
+using SharedKernel.Results;
 using Common.IntegrationEvents.Quests;
 using Mediator;
 using Quests.Application.Abstractions;

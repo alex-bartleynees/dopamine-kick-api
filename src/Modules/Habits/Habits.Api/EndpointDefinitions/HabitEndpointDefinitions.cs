@@ -1,5 +1,5 @@
-using Common.Abstractions;
-using Common.Abstractions.Results;
+using SharedKernel.AspNetCore;
+using SharedKernel.Results;
 using Habits.Api.Filters;
 using Habits.Application.Common.Models;
 using Habits.Application.Habits.Commands;

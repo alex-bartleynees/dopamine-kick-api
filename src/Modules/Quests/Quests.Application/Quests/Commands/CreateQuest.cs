@@ -1,4 +1,4 @@
-using Common.Abstractions.Results;
+using SharedKernel.Results;
 using Mediator;
 using Quests.Application.Abstractions;
 using Quests.Application.Common.Models;

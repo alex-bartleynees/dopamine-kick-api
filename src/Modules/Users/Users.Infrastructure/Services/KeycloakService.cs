@@ -1,6 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
-using Common.Abstractions.Results;
+using SharedKernel.Results;
 using Microsoft.Extensions.Options;
 using Users.Application.Abstractions;
 using Users.Application.Common.Models;

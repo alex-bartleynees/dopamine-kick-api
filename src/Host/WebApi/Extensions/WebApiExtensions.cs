@@ -1,7 +1,8 @@
 using System.Text.Json.Serialization;
-using Common.Abstractions;
-using Common.Abstractions.Messaging;
-using Common.Infrastructure.Messaging;
+using SharedKernel.AspNetCore;
+using Entitlements.Api;
+using SharedKernel.Messaging.Abstractions;
+using SharedKernel.Messaging.RabbitMq;
 using Habits.Api;
 using Microsoft.OpenApi;
 using Notifications.Api;
@@ -53,6 +54,7 @@ public static class WebApiExtensions
     builder.Services.AddHabitsModule(builder.Configuration);
     builder.Services.AddQuestsModule(builder.Configuration);
     builder.Services.AddNotificationsModule(builder.Configuration);
+    builder.Services.AddEntitlementsModule(builder.Configuration);
 
     // Register RabbitMQ Options and Services
     builder.Services.Configure<RabbitMqOptions>(
@@ -112,6 +114,7 @@ public static class WebApiExtensions
     app.Services.MigrateHabitsDatabase();
     app.Services.MigrateQuestsDatabase();
     app.Services.MigrateNotificationsDatabase();
+    app.Services.MigrateEntitlementsDatabase();
 
     if (app.Environment.IsDevelopment())
     {
