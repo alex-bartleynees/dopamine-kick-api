@@ -6,6 +6,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    env:
+      GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -61,6 +66,8 @@ jobs:
         with:
           context: .
           push: true
+          secrets: |
+            github_packages_token=${{ secrets.GITHUB_TOKEN }}
           tags: |
             creativefree/dopamine-kick-api:latest
             creativefree/dopamine-kick-api:${{ steps.tag.outputs.build_id }}

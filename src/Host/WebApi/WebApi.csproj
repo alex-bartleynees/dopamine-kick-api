@@ -11,7 +11,7 @@
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -19,7 +19,7 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="10.1.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.1" />
     <PackageReference Include="Microsoft.OpenApi" Version="2.11.0" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
     <PackageReference Include="Npgsql.OpenTelemetry" Version="10.0.0" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.16.0" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.16.0" />
@@ -44,7 +44,7 @@
     <ProjectReference Include="..\..\Modules\Habits\Habits.Api\Habits.Api.csproj" />
     <ProjectReference Include="..\..\Modules\Quests\Quests.Api\Quests.Api.csproj" />
     <ProjectReference Include="..\..\Modules\Notifications\Notifications.Api\Notifications.Api.csproj" />
-    <ProjectReference Include="..\..\Modules\Payments\Payments.Api\Payments.Api.csproj" />
+    <ProjectReference Include="..\..\Modules\Entitlements\Entitlements.Api\Entitlements.Api.csproj" />
   </ItemGroup>
 
 </Project>

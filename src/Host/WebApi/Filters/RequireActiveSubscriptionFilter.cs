@@ -1,4 +1,4 @@
-using Payments.Domain.Billing;
+using Entitlements.Domain;
 using SharedKernel.Abstractions;
 using Microsoft.AspNetCore.Http;
 

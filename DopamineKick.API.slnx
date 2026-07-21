@@ -22,11 +22,10 @@
     <Project Path="src/Modules/Notifications/Notifications.Domain/Notifications.Domain.csproj" />
     <Project Path="src/Modules/Notifications/Notifications.Infrastructure/Notifications.Infrastructure.csproj" />
   </Folder>
-  <Folder Name="/src/Modules/Payments/">
-    <Project Path="src/Modules/Payments/Payments.Api/Payments.Api.csproj" />
-    <Project Path="src/Modules/Payments/Payments.Application/Payments.Application.csproj" />
-    <Project Path="src/Modules/Payments/Payments.Domain/Payments.Domain.csproj" />
-    <Project Path="src/Modules/Payments/Payments.Infrastructure/Payments.Infrastructure.csproj" />
+  <Folder Name="/src/Modules/Entitlements/">
+    <Project Path="src/Modules/Entitlements/Entitlements.Api/Entitlements.Api.csproj" />
+    <Project Path="src/Modules/Entitlements/Entitlements.Domain/Entitlements.Domain.csproj" />
+    <Project Path="src/Modules/Entitlements/Entitlements.Infrastructure/Entitlements.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/Modules/Users/">
     <Project Path="src/Modules/Users/Users.Api/Users.Api.csproj" />

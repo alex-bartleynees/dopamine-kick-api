@@ -26,7 +26,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         "ConnectionStrings__HabitsDBConnectionString",
         "ConnectionStrings__QuestsDBConnectionString",
         "ConnectionStrings__NotificationsDBConnectionString",
-        "ConnectionStrings__PaymentsDBConnectionString",
+        "ConnectionStrings__EntitlementsDBConnectionString",
         "ConnectionStrings__RedisConnection",
         "RabbitMQ__HostName",
         "RabbitMQ__Port",
@@ -40,9 +40,6 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         "Keycloak__ClientId",
         "Keycloak__ClientSecret",
         "WebPush__Subject",
-        "Stripe__SecretKey",
-        "Stripe__WebhookSecret",
-        "Stripe__PriceId",
     ];
 
     public CustomWebApplicationFactory(ContainerFixture containers)
@@ -53,7 +50,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             ["ConnectionStrings__HabitsDBConnectionString"] = containers.ConnectionStrings["habitsdb"],
             ["ConnectionStrings__QuestsDBConnectionString"] = containers.ConnectionStrings["questsdb"],
             ["ConnectionStrings__NotificationsDBConnectionString"] = containers.ConnectionStrings["notificationsdb"],
-            ["ConnectionStrings__PaymentsDBConnectionString"] = containers.ConnectionStrings["paymentsdb"],
+            ["ConnectionStrings__EntitlementsDBConnectionString"] = containers.ConnectionStrings["entitlementsdb"],
             ["ConnectionStrings__RedisConnection"] = containers.RedisConnectionString,
 
             ["RabbitMQ__HostName"] = containers.RabbitMqHost,
@@ -71,12 +68,6 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             ["Keycloak__ClientSecret"] = "test-secret",
 
             ["WebPush__Subject"] = "mailto:test@test.local",
-
-            // Dummy Stripe config so the Stripe client can be constructed; no real Stripe calls are made
-            // in tests (billing endpoints that reach Stripe aren't exercised; webhook uses a bad signature).
-            ["Stripe__SecretKey"] = "sk_test_dummy",
-            ["Stripe__WebhookSecret"] = "whsec_dummy",
-            ["Stripe__PriceId"] = "price_dummy",
         };
 
         foreach (var key in EnvKeys)

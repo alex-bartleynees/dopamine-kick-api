@@ -12,4 +12,5 @@ public static class RoutingKeys
     public const string HabitReminderCancelledKey = "habit.reminder.cancelled";
     public const string QuestReminderCreatedKey = "quest.reminder.created";
     public const string QuestReminderCancelledKey = "quest.reminder.cancelled";
+    public const string SubscriptionEntitlementChangedKey = "subscription.entitlement.changed";
 }

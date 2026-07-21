@@ -14,7 +14,7 @@ namespace WebApi.IntegrationTests.Infrastructure;
 /// </summary>
 public sealed class ContainerFixture : IAsyncLifetime
 {
-    private static readonly string[] ModuleDatabases = ["usersdb", "habitsdb", "questsdb", "notificationsdb", "paymentsdb"];
+    private static readonly string[] ModuleDatabases = ["usersdb", "habitsdb", "questsdb", "notificationsdb", "entitlementsdb"];
 
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder()
         .WithImage("postgres:17")
