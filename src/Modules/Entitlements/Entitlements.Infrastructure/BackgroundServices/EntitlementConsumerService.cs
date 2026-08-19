@@ -1,5 +1,6 @@
 using Common.IntegrationEvents;
 using Common.IntegrationEvents.Payments;
+using Entitlements.Domain;
 using Entitlements.Domain.Entities;
 using Entitlements.Infrastructure.DbContexts;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,11 @@ public class EntitlementConsumerService(
             routingKey: RoutingKeys.SubscriptionEntitlementChangedKey,
             handler: async @event =>
             {
+                if (@event.ProductId != EntitlementProducts.DopamineKick)
+                {
+                    return;
+                }
+
                 using var scope = serviceScopeFactory.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<EntitlementsContext>();
 

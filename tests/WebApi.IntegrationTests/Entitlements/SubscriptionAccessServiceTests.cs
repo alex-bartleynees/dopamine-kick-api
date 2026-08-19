@@ -11,7 +11,7 @@ namespace WebApi.IntegrationTests.Entitlements;
 [Collection(IntegrationCollection.Name)]
 public class SubscriptionAccessServiceTests(ApiTestFixture fixture)
 {
-    private const string ProductId = "dopamine-kick";
+    private const string ProductId = EntitlementProducts.DopamineKick;
 
     [Fact]
     public async Task Returns_true_when_entitlement_row_has_HasAccess_true()
@@ -45,16 +45,31 @@ public class SubscriptionAccessServiceTests(ApiTestFixture fixture)
         result.Should().BeFalse();
     }
 
+    [Fact]
+    public async Task Returns_false_when_another_product_has_access()
+    {
+        var userId = Guid.NewGuid();
+        await SeedEntitlementAsync(userId, hasAccess: true, status: "active", productId: "coffee_journal");
+
+        var result = await CheckAccessAsync(userId);
+
+        result.Should().BeFalse();
+    }
+
     // ── helpers ─────────────────────────────────────────────────────────────
 
-    private async Task SeedEntitlementAsync(Guid userId, bool hasAccess, string status)
+    private async Task SeedEntitlementAsync(
+        Guid userId,
+        bool hasAccess,
+        string status,
+        string productId = ProductId)
     {
         await fixture.WithScopeAsync(async sp =>
         {
             var db = sp.GetRequiredService<EntitlementsContext>();
             db.Entitlements.Add(new Entitlement
             {
-                ProductId = ProductId,
+                ProductId = productId,
                 UserId = userId,
                 HasAccess = hasAccess,
                 Status = status,

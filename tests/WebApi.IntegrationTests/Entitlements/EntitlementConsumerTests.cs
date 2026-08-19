@@ -19,7 +19,7 @@ namespace WebApi.IntegrationTests.Entitlements;
 [Collection(IntegrationCollection.Name)]
 public class EntitlementConsumerTests(ApiTestFixture fixture)
 {
-    private const string ProductId = "dopamine-kick";
+    private const string ProductId = EntitlementProducts.DopamineKick;
 
     [Fact]
     public async Task Receiving_event_with_HasAccess_true_creates_entitlement_row()
@@ -66,6 +66,22 @@ public class EntitlementConsumerTests(ApiTestFixture fixture)
                 .CountAsync(e => e.UserId == userId && e.ProductId == ProductId);
             count.Should().Be(1);
         });
+    }
+
+    [Fact]
+    public async Task Event_for_another_product_is_ignored()
+    {
+        var userId = Guid.NewGuid();
+
+        await PublishAsync(userId, "coffee_journal", hasAccess: true, status: "active");
+
+        var row = await WaitForEntitlementAsync(
+            userId,
+            "coffee_journal",
+            _ => true,
+            TimeSpan.FromSeconds(2));
+
+        row.Should().BeNull("the consumer should only project dopamine_kick entitlements");
     }
 
     // ── helpers ─────────────────────────────────────────────────────────────

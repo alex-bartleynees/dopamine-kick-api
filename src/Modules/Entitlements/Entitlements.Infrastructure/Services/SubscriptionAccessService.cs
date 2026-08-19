@@ -9,5 +9,9 @@ public class SubscriptionAccessService(EntitlementsContext context) : ISubscript
     public Task<bool> HasActiveAccessAsync(Guid userId, CancellationToken ct = default) =>
         context.Entitlements
             .AsNoTracking()
-            .AnyAsync(e => e.UserId == userId && e.HasAccess, ct);
+            .AnyAsync(
+                e => e.ProductId == EntitlementProducts.DopamineKick
+                    && e.UserId == userId
+                    && e.HasAccess,
+                ct);
 }
